@@ -6,6 +6,7 @@ from datetime import datetime
 
 # Import Base from database.py
 # from app.db.database import Base
+#Comentario
 
 class User:
     """User model template"""
