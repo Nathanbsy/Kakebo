@@ -1,131 +1,221 @@
 # Kakeibo - Personal Finance Management System
 
-A personal finance management application based on the Japanese Kakeibo methodology.
+A personal finance management application based on the Japanese Kakeibo methodology with a **modern, scalable architecture**.
 
 **Frontend:** Next.js 16 + React 19 + TypeScript + Tailwind CSS  
-**Backend:** FastAPI + Python + PostgreSQL  
+**Backend:** Node.js + Express + TypeScript + MySQL  
+**Analytics:** Python (FastAPI) - Separate service for advanced analysis  
 **Integrations:** Google Sheets, Power BI, Excel Export
+
+## 🎯 Why TypeScript Backend?
+
+- ⚡ **Faster Development**: Less boilerplate, more productivity
+- 🛡️ **Type-Safe**: Catch errors at compile time, not runtime
+- 📦 **Better Ecosystem**: npm packages, tooling, community
+- 💼 **Easier Hiring**: TypeScript developers are in high demand
+- 🚀 **Production Ready**: Proven at scale (Netflix, Airbnb, etc)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+
-- Python 3.9+
-- PostgreSQL 12+
-- Docker (optional)
+- MySQL 8.0+
+- Docker & Docker Compose (optional, but recommended)
 
-### Development Setup
-
-#### Using Docker (Recommended)
+### With Docker (Recommended - 1 Command!)
 ```bash
 docker-compose up -d
 ```
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
 
-#### Manual Setup
+Services will be available at:
+- 🎨 **Frontend:** http://localhost:3000
+- 🔌 **Backend API:** http://localhost:8000
+- 📊 **Analytics Service:** http://localhost:8001
+- 🗄️  **Database:** localhost:3306
 
-**Backend:**
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp .env.example .env
-alembic upgrade head
-uvicorn app.main:app --reload
+# Stop services
+docker-compose down
+
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f analytics
 ```
 
-**Frontend:**
+### Manual Setup
+
+#### 1️⃣ Backend (TypeScript)
+```bash
+cd backend-ts
+
+# Install dependencies
+npm install
+
+# Setup database
+npm run prisma:generate
+npm run prisma:migrate
+
+# Copy environment variables
+cp .env.example .env
+
+# Start development server
+npm run dev
+# 🎉 Backend running on http://localhost:8000
+```
+
+#### 2️⃣ Analytics Service (Python)
+```bash
+cd analytics-service
+
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Copy environment variables
+cp .env.example .env
+
+# Start analytics service
+python -m uvicorn app.main:app --reload --port 8001
+# 📊 Analytics service running on http://localhost:8001
+```
+
+#### 3️⃣ Frontend
 ```bash
 cd frontend
+
+# Install dependencies
 npm install
+
+# Start development server
 npm run dev
+# 🎨 Frontend running on http://localhost:3000
+```
+
+## 📊 Architecture Overview
+
+```
+┌──────────────────────────────────────┐
+│     FRONTEND (Next.js)               │
+│     Port: 3000                       │
+└─────────────────┬────────────────────┘
+                  │
+         HTTP/REST Requests
+                  │
+     ┌────────────▼──────────────┐
+     │  BACKEND (Node.js/TS)     │
+     │  Port: 8000               │
+     └────────────┬──────────────┘
+                  │
+       ┌──────────┼──────────────┐
+       │          │              │
+    MySQL    Analytics      Services
+    (DB)     (Python)       (Sheets, BI)
+             Port: 8001
 ```
 
 ## 📁 Project Structure
 
 ```
 kakeibo/
-├── backend/              # Python FastAPI backend
+├── backend-ts/           # ⭐ Node.js + TypeScript Backend (MAIN)
+│   ├── src/
+│   │   ├── config/       # Configuration
+│   │   ├── modules/      # Feature modules
+│   │   │   ├── auth/
+│   │   │   ├── transactions/
+│   │   │   ├── categories/
+│   │   │   ├── reports/
+│   │   │   └── exports/
+│   │   ├── shared/       # Shared code
+│   │   │   ├── types/    # TypeScript types
+│   │   │   └── utils/    # Middleware, helpers
+│   │   └── index.ts      # Entry point
+│   ├── prisma/           # Database schema
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── Dockerfile
+│
+├── analytics-service/    # ⭐ Python Analytics (ADVANCED)
 │   ├── app/
-│   │   ├── models/       # Database models
-│   │   ├── schemas/      # Pydantic DTOs
-│   │   ├── routes/       # API endpoints
-│   │   ├── services/     # Business logic
-│   │   └── ...
-│   └── requirements.txt
+│   │   ├── main.py       # FastAPI entry point
+│   │   └── config.py
+│   ├── requirements.txt
+│   ├── Dockerfile
+│   └── README.md
+│
 ├── frontend/             # Next.js React frontend
 │   ├── app/              # Pages & layouts
 │   ├── components/       # React components
 │   ├── hooks/            # Custom React hooks
 │   ├── types/            # TypeScript types
 │   └── ...
-├── docker-compose.yml
-├── ARCHITECTURE.md       # Detailed architecture guide
+│
+├── backend/              # ⚠️ OLD Python backend (deprecated)
+├── docker-compose.yml    # 🐳 All services
+├── ARCHITECTURE.md       # 📚 Detailed guide
 └── README.md
 ```
 
 ## 📚 Documentation
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed project design and implementation roadmap.
+- 🏗️ [Full Architecture Guide](./ARCHITECTURE.md) - Detailed design, structure, and roadmap
+- 📖 [Backend TypeScript README](./backend-ts/README.md) - API setup and development
+- 🐍 [Analytics Service README](./analytics-service/README.md) - Python analytics service
+- 📱 [Frontend README](./frontend/README.md) - React & Next.js setup
 
 ## 🔌 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register user
-- `POST /api/auth/login` - User login
-- `POST /api/auth/refresh` - Refresh token
-- `POST /api/auth/logout` - User logout
+- `POST /api/auth/register` - Create new user account
+- `POST /api/auth/login` - Login with email & password
 
 ### Transactions
-- `GET /api/transactions` - List transactions
-- `POST /api/transactions` - Create transaction
-- `GET /api/transactions/{id}` - Get transaction
-- `PUT /api/transactions/{id}` - Update transaction
-- `DELETE /api/transactions/{id}` - Delete transaction
+- `GET /api/transactions` - List all transactions (paginated)
+- `POST /api/transactions` - Create new transaction
+- `GET /api/transactions/:id` - Get single transaction
+- `PUT /api/transactions/:id` - Update transaction
+- `DELETE /api/transactions/:id` - Delete transaction
 
 ### Categories
-- `GET /api/categories` - List categories
-- `POST /api/categories` - Create category
-- `GET /api/categories/{id}` - Get category
-- `GET /api/categories/{id}/stats` - Get category stats
-- `PUT /api/categories/{id}` - Update category
-- `DELETE /api/categories/{id}` - Delete category
+- `GET /api/categories` - List all categories
+- `POST /api/categories` - Create new category
+- `GET /api/categories/:id` - Get single category
+- `PUT /api/categories/:id` - Update category
+- `DELETE /api/categories/:id` - Delete category
 
 ### Reports & Analytics
-- `GET /api/reports/monthly` - Monthly report
-- `GET /api/reports/yearly` - Yearly report
-- `GET /api/analytics/trends` - Spending trends
-- `GET /api/analytics/forecast` - Spending forecast
-- `GET /api/analytics/comparison` - Month comparison
-
-### Exports
-- `POST /api/exports/sheets` - Export to Google Sheets
-- `POST /api/exports/excel` - Generate Excel file
-- `POST /api/exports/powerbi` - Send to Power BI
-- `GET /api/exports/history` - Export history
+- `GET /api/reports/monthly` - Monthly financial report
+- `GET /api/reports/annual` - Annual financial report
+- `POST /analytics/analyze/trends` - Advanced trend analysis (Python)
+- `POST /analytics/analyze/predictions` - Predictive analytics (Python)
 
 ## 🛠️ Tech Stack
 
 **Frontend:**
-- Next.js 16.2.6
-- React 19.2.4
+- Next.js 16+ + React 19+
 - TypeScript 5
 - Tailwind CSS 4
 - Axios
 
-**Backend:**
+**Backend (TypeScript/Node.js):**
+- Express.js
+- Prisma (ORM)
+- Zod (Validation)
+- MySQL
+- JWT Authentication
+
+**Analytics Service (Python):**
 - FastAPI
-- SQLAlchemy
-- PostgreSQL
-- Python-Jose (JWT)
-- Pydantic
+- Pandas, NumPy, Scikit-learn
+- Google Sheets API
+- Power BI API
 
 **DevOps:**
 - Docker & Docker Compose
-- PostgreSQL in container
+- MySQL 8.0
 
 ## 📝 Environment Setup
 

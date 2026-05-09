@@ -1,93 +1,80 @@
-# Kakeibo Backend
+# Kakeibo Backend - TypeScript
 
-Backend API for Kakeibo personal finance application built with FastAPI and Python.
+Modern backend API for Kakeibo personal finance application built with Express, TypeScript, and MySQL.
 
-## 📋 Overview
+## 🚀 Tech Stack
 
-Python backend with FastAPI, PostgreSQL database, and integrations with Google Sheets and Power BI for advanced reporting and analytics.
+- **Runtime**: Node.js
+- **Language**: TypeScript
+- **Framework**: Express
+- **Database**: MySQL
+- **ORM**: Prisma
+- **Authentication**: JWT
+- **Validation**: Zod
 
-## 🚀 Getting Started
+## 📦 Installation
 
-### Prerequisites
-- Python 3.9+
-- PostgreSQL 12+
-- pip or conda
-
-### Installation
-
-1. Create virtual environment:
 ```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-```
+# Install dependencies
+npm install
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-3. Setup environment:
-```bash
+# Setup environment
 cp .env.example .env
-# Edit .env with your configuration
+
+# Setup database
+npm run prisma:generate
+npm run prisma:migrate
+
+# Start development server
+npm run dev
 ```
 
-4. Run migrations:
-```bash
-alembic upgrade head
-```
+## 📝 API Endpoints
 
-5. Start server:
-```bash
-uvicorn app.main:app --reload --port 8000
-```
+### Authentication
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login user
 
-Server will be available at http://localhost:8000
+### Transactions
+- `GET /api/transactions` - List user transactions
+- `GET /api/transactions/:id` - Get transaction details
+- `POST /api/transactions` - Create transaction
+- `PUT /api/transactions/:id` - Update transaction
+- `DELETE /api/transactions/:id` - Delete transaction
 
-## 📚 API Documentation
+### Categories
+- `GET /api/categories` - List user categories
+- `GET /api/categories/:id` - Get category details
+- `POST /api/categories` - Create category
+- `PUT /api/categories/:id` - Update category
+- `DELETE /api/categories/:id` - Delete category
 
-Swagger UI: http://localhost:8000/docs
-ReDoc: http://localhost:8000/redoc
-
-## 📁 Project Structure
-
-```
-app/
-├── main.py              # FastAPI application
-├── config.py            # Configuration
-├── models/              # SQLAlchemy models
-├── schemas/             # Pydantic DTOs
-├── routes/              # API endpoints
-├── services/            # Business logic
-├── db/                  # Database setup
-├── middleware/          # Custom middleware
-└── utils/               # Utilities
-tests/                   # Test suite
-requirements.txt         # Python dependencies
-```
+### Reports
+- `GET /api/reports/monthly` - Monthly report
+- `GET /api/reports/annual` - Annual report
 
 ## 🧪 Testing
 
 ```bash
-pytest
-pytest -v              # Verbose
-pytest --cov          # With coverage
+npm test
 ```
 
-## 🔌 Integrations
+## 🐳 Docker
 
-- Google Sheets API
-- Power BI REST API
-- Excel Export (openpyxl)
+```bash
+docker-compose up
+```
 
-## 📝 Environment Variables
+## 📁 Project Structure
 
-See `.env.example` for configuration options.
-
-## 🤝 Contributing
-
-[Add contribution guidelines]
-
-## 📄 License
-
-[Add license info]
+```
+backend-ts/
+├── src/
+│   ├── config/           # Configuration files
+│   ├── modules/          # Feature modules (auth, transactions, etc)
+│   ├── shared/           # Shared utilities, types, middleware
+│   └── index.ts          # Entry point
+├── prisma/
+│   └── schema.prisma     # Database schema
+└── package.json
+```

@@ -1,33 +1,55 @@
-# 🏗️ Arquitetura - Kakeibo
+# 🏗️ Arquitetura Reestruturada - Kakeibo
 
-## 📋 Visão Geral
+## 📋 Visão Geral (2.0)
 
-Kakeibo é um sistema de gestão financeira pessoal baseado na metodologia japonesa, com frontend em Next.js e backend em Python para análises, relatórios e integração com BI.
+Kakeibo agora utiliza uma **arquitetura moderna e escalável**:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        FRONTEND (Next.js)                   │
-│  - Dashboard | Registro | Categorias | Relatórios | Config  │
-│                     (localhost:3000)                         │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-                    Axios (HTTP/REST)
-                         │
-┌────────────────────────▼────────────────────────────────────┐
-│               BACKEND (Python FastAPI)                       │
-│  - APIs REST | Processamento | Análises | Exportação       │
-│               (localhost:8000)                              │
-└────────────────────────┬────────────────────────────────────┘
-                         │
-        ┌────────────────┼────────────────┐
-        │                │                │
-    PostgreSQL    Google Sheets API    Power BI API
-    (Dados)       (Exportação)         (Relatórios)
+│               FRONTEND (Next.js + React)                    │
+│         Dashboard | Transações | Relatórios                 │
+│                (localhost:3000)                              │
+└────────────────┬────────────────────────────────────────────┘
+                 │
+            HTTP/REST API
+                 │
+┌────────────────▼────────────────────────────────────────────┐
+│        BACKEND (Node.js + Express + TypeScript)             │
+│    APIs | Auth | CRUD | Validação | Caching                │
+│                (localhost:8000)                              │
+└────────────────┬────────────────────────────────────────────┘
+     ┌───────────┼───────────┬──────────────┐
+     │           │           │              │
+   MySQL    Analytics    Sheets API    Power BI API
+  (Dados)   (Python)   (Exportar)    (Relatórios)
+            (8001)
 ```
 
----
+## 🎯 Principais Mudanças
 
-## 📁 Estrutura de Pastas
+### ✅ Backend Principal: TypeScript
+- **Express.js** para API REST
+- **Prisma** como ORM (type-safe, migrações automáticas)
+- **Zod** para validação de schemas
+- **JWT** para autenticação
+- **Muito mais rápido** de desenvolver e manter
+
+### ✅ Python: Apenas para Análises
+- Isolado em serviço separado (`analytics-service`)
+- Responsável por:
+  - Análises avançadas de dados
+  - Previsões e tendências
+  - Detecção de anomalias
+  - Integração com Google Sheets
+  - Conexão com Power BI
+  - Geração de relatórios complexos
+
+### ✅ Banco de Dados: MySQL
+- Sem problemas de PostgreSQL
+- Mais acessível para contratação
+- Comunidade maior
+
+## 📁 Estrutura de Pastas (Nova)
 
 ```
 kakeibo/
@@ -144,7 +166,7 @@ kakeibo/
 ### **Backend (Python)**
 - **Framework**: FastAPI
 - **ORM**: SQLAlchemy
-- **Banco de Dados**: PostgreSQL
+- **Banco de Dados**: MySQL
 - **Autenticação**: Python-Jose (JWT)
 - **Validação**: Pydantic
 - **Async**: Uvicorn
@@ -159,7 +181,7 @@ kakeibo/
 
 ### **DevOps**
 - **Containerização**: Docker + Docker Compose
-- **Database**: PostgreSQL em container
+- **Database**: MySQL em container
 - **Proxy**: Nginx (opcional, em produção)
 
 ---
@@ -294,7 +316,7 @@ GET    /api/exports/history        # Histórico de exportações
 ## 🚀 Fluxo de Desenvolvimento
 
 ### **Fase 1: MVP (Semanas 1-3)**
-- [ ] Setup backend (FastAPI + PostgreSQL)
+- [ ] Setup backend (FastAPI + MySQL)
 - [ ] Autenticação (JWT)
 - [ ] CRUD básico (transações, categorias)
 - [ ] Dashboard simples no frontend
@@ -355,7 +377,7 @@ npm run dev  # localhost:3000
 docker-compose up -d
 # Frontend: localhost:3000
 # Backend: localhost:8000
-# PostgreSQL: localhost:5432
+# MySQL: localhost:3306
 ```
 
 ---
@@ -366,7 +388,7 @@ docker-compose up -d
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 sqlalchemy==2.0.23
-psycopg2-binary==2.9.9
+mysql-connector-python==8.2.0
 pydantic==2.5.0
 pydantic-settings==2.1.0
 python-jose[cryptography]==3.3.0
@@ -408,7 +430,7 @@ httpx==0.25.2
    ↓
 6. Transaction Service processa
    ↓
-7. SQLAlchemy salva no PostgreSQL
+7. SQLAlchemy salva no MySQL
    ↓
 8. Retorna 201 Created + transaction object
    ↓
@@ -422,7 +444,7 @@ httpx==0.25.2
 ## 🎯 Próximos Passos
 
 1. **Criar estrutura backend** (`backend/` folder)
-2. **Setup Docker Compose** (PostgreSQL + FastAPI + Next.js)
+2. **Setup Docker Compose** (MySQL + FastAPI + Next.js)
 3. **Implementar autenticação** (JWT)
 4. **CRUD básico** (transações)
 5. **Conectar frontend ao backend**

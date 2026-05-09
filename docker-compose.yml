@@ -1,42 +1,76 @@
 /**
  * Docker Compose configuration for local development
- * Services: Frontend (Next.js), Backend (FastAPI), Database (PostgreSQL)
+ * Services: Frontend (Next.js), Backend (Node.js/TypeScript), Analytics (Python), Database (MySQL)
  */
 version: "3.8"
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:15-alpine
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
     container_name: kakeibo_db
     environment:
-      POSTGRES_USER: kakeibo
-      POSTGRES_PASSWORD: kakeibo_password
-      POSTGRES_DB: kakeibo
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: kakeibo
+      MYSQL_PASSWORD: kakeibo_password
+      MYSQL_DATABASE: kakeibo
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
     networks:
       - kakeibo_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # FastAPI Backend
+  # TypeScript Backend (Node.js)
   backend:
     build:
-      context: ./backend
+      context: ./backend-ts
       dockerfile: Dockerfile
     container_name: kakeibo_backend
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    command: npm run dev
     environment:
-      DATABASE_URL: postgresql://kakeibo:kakeibo_password@postgres:5432/kakeibo
-      DEBUG: "true"
+      NODE_ENV: development
+      API_PORT: 8000
+      DATABASE_URL: mysql://kakeibo:kakeibo_password@mysql:3306/kakeibo
       JWT_SECRET_KEY: your-secret-key-change-in-production
+      JWT_EXPIRATION_HOURS: 24
+      CORS_ORIGIN: http://localhost:3000,http://localhost:3001
+      ANALYTICS_SERVICE_URL: http://analytics:8001
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
+      mysql:
+        condition: service_healthy
     volumes:
-      - ./backend:/app
+      - ./backend-ts/src:/app/src
+      - ./backend-ts/prisma:/app/prisma
+    networks:
+      - kakeibo_network
+
+  # Python Analytics Service
+  analytics:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    container_name: kakeibo_analytics
+    command: python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8001
+    environment:
+      ANALYTICS_PORT: 8001
+      DEBUG: "true"
+      BACKEND_URL: http://backend:8000
+      GOOGLE_SHEETS_CREDENTIALS: ""
+      POWERBI_API_KEY: ""
+    ports:
+      - "8001:8001"
+    depends_on:
+      - backend
+    volumes:
+      - ./analytics-service:/app
     networks:
       - kakeibo_network
 
@@ -56,9 +90,11 @@ services:
       - /app/node_modules
     networks:
       - kakeibo_network
+    depends_on:
+      - backend
 
 volumes:
-  postgres_data:
+  mysql_data:
 
 networks:
   kakeibo_network:
