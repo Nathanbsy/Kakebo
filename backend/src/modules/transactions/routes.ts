@@ -10,7 +10,7 @@ const router = Router();
 // Validation schema
 const transactionSchema = z.object({
   categoryId: z.string(),
-  amount: z.number().positive("Amount must be positive"),
+  amount: z.number().positive("A quantia deve ser positiva"),
   description: z.string().optional(),
   date: z.string(),
   type: z.enum(["income", "expense"]),
@@ -33,7 +33,7 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
 
     const total = await prisma.transaction.count({ where: { userId } });
 
-    res.json({
+    return res.json({
       success: true,
       data: transactions,
       pagination: {
@@ -44,14 +44,14 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // GET /api/transactions/:id
 router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
     const transaction = await prisma.transaction.findFirst({
@@ -63,9 +63,9 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, error: "Transaction not found" });
     }
 
-    res.json({ success: true, data: transaction });
+    return res.json({ success: true, data: transaction });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
@@ -75,7 +75,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
     const userId = req.user?.id;
     const data = transactionSchema.parse(req.body);
 
-    // Verify category belongs to user
+    // Verificar se a categoria pertence ao usuário
     const category = await prisma.category.findFirst({
       where: { id: data.categoryId, userId },
     });
@@ -87,26 +87,26 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
     const transaction = await prisma.transaction.create({
       data: {
         ...data,
-        userId,
+        userId: userId!,
         date: new Date(data.date),
-        amount: BigInt(Math.round(data.amount * 100)) as any,
+        amount: BigInt(Math.round(data.amount * 100)) as any, 
       },
       include: { category: true },
     });
 
-    res.status(201).json({ success: true, data: transaction });
+    return res.status(201).json({ success: true, data: transaction });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
     }
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // PUT /api/transactions/:id
 router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const userId = req.user?.id;
     const data = transactionSchema.partial().parse(req.body);
 
@@ -129,19 +129,19 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
       include: { category: true },
     });
 
-    res.json({ success: true, data: updated });
+    return res.json({ success: true, data: updated });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
     }
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // DELETE /api/transactions/:id
 router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
     const transaction = await prisma.transaction.findFirst({
@@ -154,9 +154,10 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
 
     await prisma.transaction.delete({ where: { id } });
 
-    res.json({ success: true, data: { id } });
+    return res.json({ success: true, data: { id } });
+
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 

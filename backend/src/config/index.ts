@@ -5,13 +5,13 @@ dotenv.config();
 export const config = {
   // Database
   database: {
-    url: process.env.DATABASE_URL || "mysql://user:password@localhost:3306/kakeibo",
+    url: process.env.DATABASE_URL,
   },
 
   // JWT
   jwt: {
     secret: process.env.JWT_SECRET_KEY || "your-secret-key-change-in-production",
-    expirationHours: parseInt(process.env.JWT_EXPIRATION_HOURS || "24"),
+    expirationHours: 24,
   },
 
   // API

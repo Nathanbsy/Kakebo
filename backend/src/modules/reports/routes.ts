@@ -9,6 +9,12 @@ const router = Router();
 router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+    
+    // Validar se userId existe
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
     const { year = new Date().getFullYear(), month = new Date().getMonth() + 1 } = req.query;
 
     const startDate = new Date(Number(year), Number(month) - 1, 1);
@@ -35,7 +41,7 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    // Group by category
+    // Group by category com tipos corretos
     const byCategory = transactions.reduce(
       (acc, t) => {
         const cat = t.category.name;
@@ -46,10 +52,10 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
         acc[cat].transactions.push(t);
         return acc;
       },
-      {} as Record<string, any>
+      {} as Record<string, { total: number; type: string; transactions: typeof transactions }>
     );
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         period: `${year}-${String(month).padStart(2, "0")}`,
@@ -63,7 +69,7 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
@@ -71,6 +77,12 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
 router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
+    
+    // Validar se userId existe
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
     const { year = new Date().getFullYear() } = req.query;
 
     const startDate = new Date(Number(year), 0, 1);
@@ -96,7 +108,7 @@ router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
       .filter((t) => t.type === "expense")
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    // Group by month
+    // Group by month com tipos corretos
     const byMonth = Array(12)
       .fill(null)
       .reduce(
@@ -109,7 +121,7 @@ router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
           };
           return acc;
         },
-        {} as Record<string, any>
+        {} as Record<string, { income: number; expense: number; balance: number }>
       );
 
     transactions.forEach((t) => {
@@ -122,7 +134,7 @@ router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
       byMonth[monthKey].balance = byMonth[monthKey].income - byMonth[monthKey].expense;
     });
 
-    res.json({
+    return res.json({
       success: true,
       data: {
         year,
@@ -135,7 +147,7 @@ router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
       },
     });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 

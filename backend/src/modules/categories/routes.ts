@@ -23,16 +23,16 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
       orderBy: { name: "asc" },
     });
 
-    res.json({ success: true, data: categories });
+    return res.json({ success: true, data: categories });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // GET /api/categories/:id
 router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
     const category = await prisma.category.findFirst({
@@ -43,9 +43,9 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, error: "Category not found" });
     }
 
-    res.json({ success: true, data: category });
+    return res.json({ success: true, data: category });
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
@@ -56,13 +56,11 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
     const data = categorySchema.parse(req.body);
 
     const category = await prisma.category.create({
-      data: {
-        ...data,
-        userId,
-      },
+      //cria a categoria associada ao usuário autenticado utilizando os dados validados do corpo da requisição
+      data: { ...data, userId: userId! },
     });
 
-    res.status(201).json({ success: true, data: category });
+    return res.status(201).json({ success: true, data: category });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
@@ -70,14 +68,14 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
     if (error.code === "P2002") {
       return res.status(400).json({ success: false, error: "Category name already exists" });
     }
-    res.status(500).json({ success: false, error: "Internal server error" });
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // PUT /api/categories/:id
 router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const userId = req.user?.id;
     const data = categorySchema.partial().parse(req.body);
 
@@ -94,19 +92,20 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
       data,
     });
 
-    res.json({ success: true, data: updated });
+    return res.json({ success: true, data: updated });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
     }
-    res.status(500).json({ success: false, error: "Internal server error" });
+    
+    return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
 // DELETE /api/categories/:id
 router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
     const category = await prisma.category.findFirst({
@@ -125,16 +124,65 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
     if (transactionCount > 0) {
       return res.status(400).json({
         success: false,
-        error: "Cannot delete category with transactions. Delete transactions first.",
+        error: "Não é possivel excluir a categoria com transações existentes. Exclua as transações primeiro.",
       });
     }
 
     await prisma.category.delete({ where: { id } });
 
-    res.json({ success: true, data: { id } });
+    return res.json({ success: true, data: { id } });
+
   } catch (error) {
-    res.status(500).json({ success: false, error: "Internal server error" });
+
+    return res.status(500).json({ success: false, error: "Internal server error" });
+
   }
 });
+
+/*
+router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params as { id: string };
+    const userId = req.user?.id;
+
+    const category = await prisma.category.findFirst({
+      where: { id, userId },
+    });
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        error: "Category not found",
+      });
+    }
+
+    const transactionCount = await prisma.transaction.count({
+      where: { categoryId: id },
+    });
+
+    if (transactionCount > 0) {
+      return res.status(400).json({
+        success: false,
+        error: "Não é possivel excluir a categoria com transações existentes.",
+      });
+    }
+
+    await prisma.category.delete({
+      where: { id },
+    });
+
+    return res.json({
+      success: true,
+      data: { id },
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      error: "Internal server error",
+    });
+  }
+});
+*/
 
 export const categoriesRouter = router;

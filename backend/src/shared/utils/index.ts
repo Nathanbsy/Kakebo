@@ -5,12 +5,6 @@ const JWT_SECRET = process.env.JWT_SECRET_KEY || "your-secret-key-change-in-prod
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION_HOURS || "24";
 
 export const tokenUtils = {
-  generateToken: (payload: Omit<JWTPayload, "iat" | "exp">): string => {
-    return jwt.sign(payload, JWT_SECRET, {
-      expiresIn: `${JWT_EXPIRATION}h`,
-    });
-  },
-
   verifyToken: (token: string): JWTPayload => {
     return jwt.verify(token, JWT_SECRET) as JWTPayload;
   },
