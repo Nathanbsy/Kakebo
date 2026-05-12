@@ -1,9 +1,6 @@
-/**
- * Transaction form component
- */
 import { useState } from "react";
 
-export default function TransactionForm() {
+export default function MovimentacaoForm() {
   const [formData, setFormData] = useState({
     quantia: "",
     descricao: "",
@@ -12,6 +9,7 @@ export default function TransactionForm() {
     tipo: "despesa",
   });
 
+  //depois subistituir essa bomba por aquela coisinha do bao
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement

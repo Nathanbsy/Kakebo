@@ -5,8 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import { AuthResponse } from "../../shared/types";
 import jwt from "jsonwebtoken";
-
-const JWT_SECRET = "tokenparatestes";
+import { config } from "../../config";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -42,10 +41,12 @@ router.post("/register", async (req: Request, res: Response) => {
     });
 
     // gera o token de autenticação
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
-
+    const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: "24h" });
+    const refreshToken = jwt.sign({ id: user.id, email: user.email }, config.jwt.refreshSecret, { expiresIn: "7d" });
+    
     const response: AuthResponse = {
       token,
+      refreshToken,
       user: { id: user.id, email: user.email, nome: user.nome },
     };
 
@@ -76,15 +77,18 @@ router.post("/login", async (req: Request, res: Response) => {
     }
 
     // gera o token de autenticação
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "24h" });
+    const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: "24h" });
+    const refreshToken = jwt.sign({ id: user.id, email: user.email }, config.jwt.refreshSecret, { expiresIn: "7d" });
 
 
     const response: AuthResponse = {
       token,
+      refreshToken,
       user: { id: user.id, email: user.email, nome: user.nome },
     };
 
     return res.json({ success: true, data: response });
+    
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });

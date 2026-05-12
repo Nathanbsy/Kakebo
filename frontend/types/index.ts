@@ -1,7 +1,3 @@
-/**
- * Type definitions for Kakeibo
- */
-
 export interface User {
   id: string;
   email: string;
@@ -17,8 +13,7 @@ export interface Categoria {
   color?: string;
 }
 
-export interface Transaction {
-  id: string;Movimentacao {
+export interface Movimentacao {
   id: string;
   userId: string;
   categoriaId: string;
@@ -26,9 +21,9 @@ export interface Transaction {
   descricao?: string;
   data: string;
   tipo: "receita" | "despesa";
-  metodo: "dinheiro" | "cartão" | "transferência_bancária";
-  dataCriacao
-
+  metodo: "dinheiro" | "cartão" | "transferência bancária" | "pix";
+  dataCriacao: string;
+}
 export interface Relatorio {
   id: string;
   userId: string;

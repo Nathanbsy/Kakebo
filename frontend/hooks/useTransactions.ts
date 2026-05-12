@@ -1,12 +1,8 @@
-/**
- * Transactions hook
- */
 import { useState, useCallback } from "react";
-import { Transaction } from "@/types";
-import api from "@/services/api";
+import { Movimentacao } from "@/frontend/types";
 
 export function useTransactions() {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactions, setTransactions] = useState<Movimentacao[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +19,7 @@ export function useTransactions() {
     }
   }, []);
 
-  const createTransaction = useCallback(async (data: Partial<Transaction>) => {
+  const createTransaction = useCallback(async (data: Partial<Movimentacao>) => {
     try {
       setLoading(true);
       // const response = await api.post("/transactions", data);

@@ -1,14 +1,11 @@
-/**
- * Category manager component
- */
 import { useState } from "react";
-import { Category } from "@/types";
+import { Categoria } from "../types";
 
 interface Props {
-  categories: Category[];
+  categorias: Categoria[];
 }
 
-export default function CategoryManager({ categories }: Props) {
+export default function CategoryManager({ categorias }: Props) {
   const [showForm, setShowForm] = useState(false);
 
   return (
@@ -40,14 +37,15 @@ export default function CategoryManager({ categories }: Props) {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {categories.map((category) => (
+        {categorias.map((categoria) => (
           <div
-            key={category.id}
+            key={categoria.id}
             className="p-4 border rounded-lg bg-white shadow-sm"
           >
-            <h3 className="font-semibold">{category.name}</h3>
+            <h3 className="font-semibold">{categoria.nome}</h3>
             <p className="text-sm text-gray-600">
-              Limite: {category.budget_limit}
+              {/* depois adicionar a exibicao do icon */}
+              {categoria.icon}
             </p>
           </div>
         ))}

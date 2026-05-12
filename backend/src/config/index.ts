@@ -10,7 +10,8 @@ export const config = {
 
   // JWT
   jwt: {
-    secret: process.env.JWT_SECRET_KEY || "your-secret-key-change-in-production",
+    secret: process.env.JWT_SECRET_KEY || "TOKENparaTRETE",
+    refreshSecret: process.env.JWT_REFRESH_SECRET || "TOKENREFRESHparaTRETE",
     expirationHours: 24,
   },
 

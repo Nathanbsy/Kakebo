@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import { config } from "./config";
 import { authMiddleware, errorMiddleware } from "./shared/utils/middleware";
 import { authRouter } from "./modules/auth/routes";
@@ -9,10 +10,10 @@ import { reportsRouter } from "./modules/reports/routes";
 
 const app = express();
 
-// middelware
 app.use(cors(config.cors));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // rotas
 app.get("/", (req, res) => {

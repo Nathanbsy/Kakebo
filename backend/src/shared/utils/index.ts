@@ -1,5 +1,6 @@
 import * as jwt from "jsonwebtoken";
 import { JWTPayload } from "../types";
+import { Request, Response } from "express";
 
 const JWT_SECRET = process.env.JWT_SECRET_KEY || "your-secret-key-change-in-production";
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION_HOURS || "24";
@@ -12,6 +13,26 @@ export const tokenUtils = {
   decodeToken: (token: string): JWTPayload | null => {
     return jwt.decode(token) as JWTPayload | null;
   },
+
+  refreshToken: (req: Request, res: Response): string => {
+
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      throw { statusCode: 401, message: "Missing refresh token" };
+    }
+
+    try {
+      const decoded = tokenUtils.verifyToken(refreshToken);
+
+      const payload: JWTPayload = { id: decoded.id, email: decoded.email };
+      
+      return jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+    } catch (error) {
+      throw { statusCode: 401, message: "Invalid refresh token" };
+    }
+
+  }
 };
 
 export const errorHandler = (error: any): { statusCode: number; message: string } => {

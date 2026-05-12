@@ -13,7 +13,7 @@ const categorySchema = z.object({
   icon: z.string().optional(),
 });
 
-// GET /api/categories
+// GET /api/categorias
 router.get("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -29,7 +29,7 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/categories/:id
+// GET /api/categorias/:id
 router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
@@ -49,7 +49,7 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// POST /api/categories
+// POST /api/categorias
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -72,7 +72,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// PUT /api/categories/:id
+// PUT /api/categorias/:id
 router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
@@ -102,7 +102,7 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// DELETE /api/categories/:id
+// DELETE /api/categorias/:id
 router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };

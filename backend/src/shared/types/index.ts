@@ -7,6 +7,7 @@ export interface JWTPayload {
 
 export interface AuthResponse {
   token: string;
+  refreshToken: string;
   user: {
     id: string;
     email: string;
@@ -20,7 +21,7 @@ export interface MovimentacaoData {
   descricao?: string;
   data: string;
   tipo: "receita" | "despesa";
-  metodo?: "dinheiro" | "cartão" | "transferência_bancária";
+  metodo?: "dinheiro" | "cartão" | "transferência bancária" | "pix";
 }
 
 export interface CategoriaData {

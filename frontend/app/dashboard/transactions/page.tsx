@@ -4,8 +4,8 @@
 "use client";
 
 import { useState } from "react";
-import TransactionForm from "@/components/TransactionForm";
-import TransactionList from "@/components/TransactionList";
+import MovimentacaoForm from "@/frontend/components/MovimentacaoForm";
+import MovimentacaoList from "@/frontend/components/MovimentacaoList";
 
 export default function TransactionsPage() {
   const [showForm, setShowForm] = useState(false);
@@ -25,12 +25,12 @@ export default function TransactionsPage() {
 
       {showForm && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <TransactionForm />
+          <MovimentacaoForm />
         </div>
       )}
 
       <div className="bg-white rounded-lg shadow">
-        <TransactionList transactions={transactions} />
+        <MovimentacaoList movimentacoes={transactions} />
       </div>
     </div>
   );
