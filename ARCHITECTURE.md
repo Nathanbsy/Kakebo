@@ -218,8 +218,8 @@ CREATE TABLE transactions (
   amount DECIMAL(10,2) NOT NULL,
   description VARCHAR,
   date DATE NOT NULL,
-  type VARCHAR CHECK (type IN ('income', 'expense')),
-  method VARCHAR CHECK (method IN ('cash', 'card', 'bank_transfer')),
+  type VARCHAR CHECK (type IN ('receita', 'despesa')),
+  method VARCHAR CHECK (method IN ('dinheiro', 'cartão', 'transferência_bancária')),
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -420,8 +420,8 @@ httpx==0.25.2
      category_id: "uuid",
      description: "Café",
      date: "2026-05-08",
-     type: "expense",
-     method: "cash"
+     type: "despesa",
+     method: "dinheiro"
    }
    ↓
 4. Backend recebe em routes/transactions.py

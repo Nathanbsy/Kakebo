@@ -10,29 +10,29 @@ export interface AuthResponse {
   user: {
     id: string;
     email: string;
-    name: string;
+    nome: string;
   };
 }
 
-export interface TransactionData {
-  categoryId: string;
-  amount: number;
-  description?: string;
-  date: string;
-  type: "income" | "expense";
-  method?: "cash" | "card" | "bank_transfer";
+export interface MovimentacaoData {
+  categoriaId: string;
+  quantia: number;
+  descricao?: string;
+  data: string;
+  tipo: "receita" | "despesa";
+  metodo?: "dinheiro" | "cartão" | "transferência_bancária";
 }
 
-export interface CategoryData {
-  name: string;
+export interface CategoriaData {
+  nome: string;
   color?: string;
   icon?: string;
 }
 
-export interface ReportData {
-  title: string;
-  type: "monthly" | "annual" | "category";
-  data: Record<string, any>;
+export interface RelatorioData {
+  titulo: string;
+  tipo: "mensal" | "anual" | "categoria" | "semanal";
+  dados: Record<string, any>;
 }
 
 export interface ApiResponse<T = any> {

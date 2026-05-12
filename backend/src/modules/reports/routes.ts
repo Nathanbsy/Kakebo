@@ -5,8 +5,8 @@ import { authMiddleware } from "../../shared/utils/middleware";
 const prisma = new PrismaClient();
 const router = Router();
 
-// GET /api/reports/monthly
-router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
+// GET /api/relatorios/mensal
+router.get("/mensal", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     
@@ -20,39 +20,39 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
     const startDate = new Date(Number(year), Number(month) - 1, 1);
     const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59);
 
-    // Get transactions
-    const transactions = await prisma.transaction.findMany({
+    // Get movimentacoes
+    const movimentacoes = await prisma.movimentacao.findMany({
       where: {
         userId,
-        date: {
+        data: {
           gte: startDate,
           lte: endDate,
         },
       },
-      include: { category: true },
+      include: { categoria: true },
     });
 
     // Calculate totals
-    const income = transactions
-      .filter((t) => t.type === "income")
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+    const receita = movimentacoes
+      .filter((t) => t.tipo === "receita")
+      .reduce((sum, t) => sum + Number(t.quantia), 0);
 
-    const expense = transactions
-      .filter((t) => t.type === "expense")
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+    const despesa = movimentacoes
+      .filter((t) => t.tipo === "despesa")
+      .reduce((sum, t) => sum + Number(t.quantia), 0);
 
-    // Group by category com tipos corretos
-    const byCategory = transactions.reduce(
+    // Group by categoria com tipos corretos
+    const porCategoria = movimentacoes.reduce(
       (acc, t) => {
-        const cat = t.category.name;
+        const cat = t.categoria.nome;
         if (!acc[cat]) {
-          acc[cat] = { total: 0, type: t.type, transactions: [] };
+          acc[cat] = { total: 0, tipo: t.tipo, movimentacoes: [] };
         }
-        acc[cat].total += Number(t.amount);
-        acc[cat].transactions.push(t);
+        acc[cat].total += Number(t.quantia);
+        acc[cat].movimentacoes.push(t);
         return acc;
       },
-      {} as Record<string, { total: number; type: string; transactions: typeof transactions }>
+      {} as Record<string, { total: number; tipo: string; movimentacoes: typeof movimentacoes }>
     );
 
     return res.json({
@@ -60,12 +60,12 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
       data: {
         period: `${year}-${String(month).padStart(2, "0")}`,
         summary: {
-          income,
-          expense,
-          balance: income - expense,
+          receita,
+          despesa,
+          saldo: receita - despesa,
         },
-        byCategory,
-        transactions,
+        porCategoria,
+        movimentacoes,
       },
     });
   } catch (error) {
@@ -73,8 +73,8 @@ router.get("/monthly", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/reports/annual
-router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
+// GET /api/relatorios/anual
+router.get("/anual", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     
@@ -88,50 +88,50 @@ router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
     const startDate = new Date(Number(year), 0, 1);
     const endDate = new Date(Number(year), 11, 31, 23, 59, 59);
 
-    const transactions = await prisma.transaction.findMany({
+    const movimentacoes = await prisma.movimentacao.findMany({
       where: {
         userId,
-        date: {
+        data: {
           gte: startDate,
           lte: endDate,
         },
       },
-      include: { category: true },
+      include: { categoria: true },
     });
 
     // Calculate totals
-    const income = transactions
-      .filter((t) => t.type === "income")
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+    const receita = movimentacoes
+      .filter((t) => t.tipo === "receita")
+      .reduce((sum, t) => sum + Number(t.quantia), 0);
 
-    const expense = transactions
-      .filter((t) => t.type === "expense")
-      .reduce((sum, t) => sum + Number(t.amount), 0);
+    const despesa = movimentacoes
+      .filter((t) => t.tipo === "despesa")
+      .reduce((sum, t) => sum + Number(t.quantia), 0);
 
     // Group by month com tipos corretos
-    const byMonth = Array(12)
+    const porMes = Array(12)
       .fill(null)
       .reduce(
         (acc, _, i) => {
           const monthKey = String(i + 1).padStart(2, "0");
           acc[monthKey] = {
-            income: 0,
-            expense: 0,
-            balance: 0,
+            receita: 0,
+            despesa: 0,
+            saldo: 0,
           };
           return acc;
         },
-        {} as Record<string, { income: number; expense: number; balance: number }>
+        {} as Record<string, { receita: number; despesa: number; saldo: number }>
       );
 
-    transactions.forEach((t) => {
-      const monthKey = String(t.date.getMonth() + 1).padStart(2, "0");
-      if (t.type === "income") {
-        byMonth[monthKey].income += Number(t.amount);
+    movimentacoes.forEach((t) => {
+      const monthKey = String(t.data.getMonth() + 1).padStart(2, "0");
+      if (t.tipo === "receita") {
+        porMes[monthKey].receita += Number(t.quantia);
       } else {
-        byMonth[monthKey].expense += Number(t.amount);
+        porMes[monthKey].despesa += Number(t.quantia);
       }
-      byMonth[monthKey].balance = byMonth[monthKey].income - byMonth[monthKey].expense;
+      porMes[monthKey].saldo = porMes[monthKey].receita - porMes[monthKey].despesa;
     });
 
     return res.json({
@@ -139,11 +139,11 @@ router.get("/annual", authMiddleware, async (req: Request, res: Response) => {
       data: {
         year,
         summary: {
-          income,
-          expense,
-          balance: income - expense,
+          receita,
+          despesa,
+          saldo: receita - despesa,
         },
-        byMonth,
+        porMes,
       },
     });
   } catch (error) {

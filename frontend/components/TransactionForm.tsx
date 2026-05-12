@@ -5,11 +5,11 @@ import { useState } from "react";
 
 export default function TransactionForm() {
   const [formData, setFormData] = useState({
-    amount: "",
-    description: "",
-    date: "",
-    category: "",
-    type: "expense",
+    quantia: "",
+    descricao: "",
+    data: "",
+    categoria: "",
+    tipo: "despesa",
   });
 
   const handleChange = (
@@ -30,12 +30,12 @@ export default function TransactionForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">
-          Valor
+          Quantia
         </label>
         <input
           type="number"
-          name="amount"
-          value={formData.amount}
+          name="quantia"
+          value={formData.quantia}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
@@ -46,8 +46,8 @@ export default function TransactionForm() {
           Descrição
         </label>
         <textarea
-          name="description"
-          value={formData.description}
+          name="descricao"
+          value={formData.descricao}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border-gray-300"
         />
@@ -56,8 +56,8 @@ export default function TransactionForm() {
         <label className="block text-sm font-medium text-gray-700">Data</label>
         <input
           type="date"
-          name="date"
-          value={formData.date}
+          name="data"
+          value={formData.data}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
@@ -68,8 +68,8 @@ export default function TransactionForm() {
           Categoria
         </label>
         <select
-          name="category"
-          value={formData.category}
+          name="categoria"
+          value={formData.categoria}
           onChange={handleChange}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
@@ -81,7 +81,7 @@ export default function TransactionForm() {
         type="submit"
         className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
       >
-        Adicionar Transação
+        Adicionar Movimentação
       </button>
     </form>
   );

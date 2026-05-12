@@ -14,7 +14,7 @@ const router = Router();
 const registerSchema = z.object({
   email: z.string().email("Email inválido"),
   password: z.string().min(6, "A senha precisa ter pelo menos 6 caracteres"),
-  name: z.string().min(2, "O nome precisa ter pelo menos 2 caracteres"),
+  nome: z.string().min(2, "O nome precisa ter pelo menos 2 caracteres"),
 });
 
 const loginSchema = z.object({
@@ -25,10 +25,10 @@ const loginSchema = z.object({
 // POST /api/auth/register
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = registerSchema.parse(req.body);
+    const { email, password, nome } = registerSchema.parse(req.body);
 
     // Verifica se o usuario já existe
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.usuario.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ success: false, error: "Usuário já existe" });
     }
@@ -37,8 +37,8 @@ router.post("/register", async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // cria o usuario
-    const user = await prisma.user.create({
-      data: { email, password: hashedPassword, name },
+    const user = await prisma.usuario.create({
+      data: { email, senha: hashedPassword, nome },
     });
 
     // gera o token de autenticação
@@ -46,7 +46,7 @@ router.post("/register", async (req: Request, res: Response) => {
 
     const response: AuthResponse = {
       token,
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, nome: user.nome },
     };
 
     return res.status(201).json({ success: true, data: response });
@@ -64,13 +64,13 @@ router.post("/login", async (req: Request, res: Response) => {
     const { email, password } = loginSchema.parse(req.body);
 
     // encontra o usuario pelo email
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.usuario.findUnique({ where: { email } });
     if (!user) {
       return res.status(401).json({ success: false, error: "Credenciais inválidas" });
     }
 
     // comparando a senha criptografada com a senha fornecida
-    const isCorrectPassword = await bcrypt.compare(password, user.password);
+    const isCorrectPassword = await bcrypt.compare(password, user.senha);
     if (!isCorrectPassword) {
       return res.status(401).json({ success: false, error: "Credenciais inválidas" });
     }
@@ -81,7 +81,7 @@ router.post("/login", async (req: Request, res: Response) => {
 
     const response: AuthResponse = {
       token,
-      user: { id: user.id, email: user.email, name: user.name },
+      user: { id: user.id, email: user.email, nome: user.nome },
     };
 
     return res.json({ success: true, data: response });

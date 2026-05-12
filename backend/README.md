@@ -64,17 +64,3 @@ npm test
 ```bash
 docker-compose up
 ```
-
-## 📁 Project Structure
-
-```
-backend-ts/
-├── src/
-│   ├── config/           # Configuration files
-│   ├── modules/          # Feature modules (auth, transactions, etc)
-│   ├── shared/           # Shared utilities, types, middleware
-│   └── index.ts          # Entry point
-├── prisma/
-│   └── schema.prisma     # Database schema
-└── package.json
-```

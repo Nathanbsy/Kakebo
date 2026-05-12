@@ -5,39 +5,38 @@
 export interface User {
   id: string;
   email: string;
-  name?: string;
-  created_at: string;
+  nome?: string;
+  dataCriacao: string;
 }
 
-export interface Category {
+export interface Categoria {
   id: string;
-  user_id: string;
-  name: string;
+  userId: string;
+  nome: string;
   icon?: string;
   color?: string;
-  budget_limit?: number;
 }
 
 export interface Transaction {
+  id: string;Movimentacao {
   id: string;
-  user_id: string;
-  category_id: string;
-  amount: number;
-  description?: string;
-  date: string;
-  type: "income" | "expense";
-  method: "cash" | "card" | "bank_transfer";
-  created_at: string;
-}
+  userId: string;
+  categoriaId: string;
+  quantia: number;
+  descricao?: string;
+  data: string;
+  tipo: "receita" | "despesa";
+  metodo: "dinheiro" | "cartão" | "transferência_bancária";
+  dataCriacao
 
-export interface Report {
+export interface Relatorio {
   id: string;
-  user_id: string;
-  name?: string;
-  report_type: string;
-  frequency: "daily" | "weekly" | "monthly";
-  enabled: boolean;
-  created_at: string;
+  userId: string;
+  titulo?: string;
+  tipoRelatorio: string;
+  frequencia: "diária" | "semanal" | "mensal";
+  ativo: boolean;
+  dataCriacao: string;
 }
 
 export interface AuthResponse {

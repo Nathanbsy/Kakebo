@@ -11,63 +11,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Usuario {
   id        String     @id @default(cuid())
   email     String     @unique
-  password  String
-  name      String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  senha     String
+  nome      String
+  dataCriacao DateTime   @default(now())
+  dataAtualizacao DateTime   @updatedAt
 
-  transactions Transaction[]
-  categories   Category[]
-  reports      Report[]
+  movimentacoes Movimentacao[]
+  categorias   Categoria[]
+  reports      Relatorio[]
 
-  @@map("users")
+  @@map("usuarios")
 }
 
-model Category {
+model Categoria {
   id        String     @id @default(cuid())
   userId    String
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name      String
+  user      Usuario       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nome      String
   color     String?    @default("#000000")
   icon      String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  dataCriacao DateTime   @default(now())
+  dataAtualizacao DateTime   @updatedAt
 
-  transactions Transaction[]
+  movimentacoes Movimentacao[]
 
-  @@unique([userId, name])
-  @@map("categories")
+  @@unique([userId, nome])
+  @@map("categorias")
 }
 
-model Transaction {
+model Movimentacao {
   id          String   @id @default(cuid())
   userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  amount      Decimal  @db.Decimal(10, 2)
-  description String?
-  date        DateTime
-  type        String   // "income" | "expense"
-  method      String?  // "cash" | "card" | "bank_transfer"
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  user        Usuario     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoriaId  String
+  categoria    Categoria @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  quantia      Decimal  @db.Decimal(10, 2)
+  descricao String?
+  data        DateTime
+  tipo        String   // "receita" | "despesa"
+  metodo      String?  // "dinheiro" | "cartão" | "transferência_bancária"
+  dataCriacao   DateTime @default(now())
+  dataAtualizacao   DateTime @updatedAt
 
-  @@map("transactions")
+  @@map("movimentacoes")
 }
 
-model Report {
+model Relatorio {
   id        String   @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title     String
-  type      String   // "monthly" | "annual" | "category"
-  data      Json
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      Usuario     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  titulo     String
+  tipo      String   // "mensal" | "anual" | "categoria" | "semanal"
+  dados      Json
+  dataCriacao DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  @@map("reports")
+  @@map("relatorios")
 }

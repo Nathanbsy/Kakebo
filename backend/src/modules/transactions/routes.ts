@@ -2,40 +2,40 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { authMiddleware } from "../../shared/utils/middleware";
-import { TransactionData } from "../../shared/types";
+import { MovimentacaoData } from "../../shared/types";
 
 const prisma = new PrismaClient();
 const router = Router();
 
 // Validation schema
-const transactionSchema = z.object({
-  categoryId: z.string(),
-  amount: z.number().positive("A quantia deve ser positiva"),
-  description: z.string().optional(),
-  date: z.string(),
-  type: z.enum(["income", "expense"]),
-  method: z.enum(["cash", "card", "bank_transfer"]).optional(),
+const movimentacaoSchema = z.object({
+  categoriaId: z.string(),
+  quantia: z.number().positive("A quantia deve ser positiva"),
+  descricao: z.string().optional(),
+  data: z.string(),
+  tipo: z.enum(["receita", "despesa"]),
+  metodo: z.enum(["dinheiro", "cartão", "transferência bancária", "pix"]).optional(),
 });
 
-// GET /api/transactions
+// GET /api/movimentacoes
 router.get("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
     const { page = 1, limit = 20 } = req.query;
 
-    const transactions = await prisma.transaction.findMany({
+    const movimentacoes = await prisma.movimentacao.findMany({
       where: { userId },
       skip: (Number(page) - 1) * Number(limit),
       take: Number(limit),
-      include: { category: true },
-      orderBy: { date: "desc" },
+      include: { categoria: true },
+      orderBy: { data: "desc" },
     });
 
-    const total = await prisma.transaction.count({ where: { userId } });
+    const total = await prisma.movimentacao.count({ where: { userId } });
 
     return res.json({
       success: true,
-      data: transactions,
+      data: movimentacoes,
       pagination: {
         page: Number(page),
         limit: Number(limit),
@@ -48,53 +48,53 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/transactions/:id
+// GET /api/movimentacoes/:id
 router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
-    const transaction = await prisma.transaction.findFirst({
+    const movimentacao = await prisma.movimentacao.findFirst({
       where: { id, userId },
-      include: { category: true },
+      include: { categoria: true },
     });
 
-    if (!transaction) {
-      return res.status(404).json({ success: false, error: "Transaction not found" });
+    if (!movimentacao) {
+      return res.status(404).json({ success: false, error: "Movimentação não encontrada" });
     }
 
-    return res.json({ success: true, data: transaction });
+    return res.json({ success: true, data: movimentacao });
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });
 
-// POST /api/transactions
+// POST /api/movimentacoes
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const data = transactionSchema.parse(req.body);
+    const data = movimentacaoSchema.parse(req.body);
 
     // Verificar se a categoria pertence ao usuário
-    const category = await prisma.category.findFirst({
-      where: { id: data.categoryId, userId },
+    const categoria = await prisma.categoria.findFirst({
+      where: { id: data.categoriaId, userId },
     });
 
-    if (!category) {
-      return res.status(404).json({ success: false, error: "Category not found" });
+    if (!categoria) {
+      return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
-    const transaction = await prisma.transaction.create({
+    const movimentacao = await prisma.movimentacao.create({
       data: {
         ...data,
         userId: userId!,
-        date: new Date(data.date),
-        amount: BigInt(Math.round(data.amount * 100)) as any, 
+        data: new Date(data.data),
+        quantia: BigInt(Math.round(data.quantia * 100)) as any, 
       },
-      include: { category: true },
+      include: { categoria: true },
     });
 
-    return res.status(201).json({ success: true, data: transaction });
+    return res.status(201).json({ success: true, data: movimentacao });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
@@ -103,30 +103,30 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// PUT /api/transactions/:id
+// PUT /api/movimentacoes/:id
 router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
-    const data = transactionSchema.partial().parse(req.body);
+    const data = movimentacaoSchema.partial().parse(req.body);
 
-    // Verify transaction belongs to user
-    const transaction = await prisma.transaction.findFirst({
+    // Verify movimentacao belongs to user
+    const movimentacao = await prisma.movimentacao.findFirst({
       where: { id, userId },
     });
 
-    if (!transaction) {
-      return res.status(404).json({ success: false, error: "Transaction not found" });
+    if (!movimentacao) {
+      return res.status(404).json({ success: false, error: "Movimentação não encontrada" });
     }
 
-    const updated = await prisma.transaction.update({
+    const updated = await prisma.movimentacao.update({
       where: { id },
       data: {
         ...data,
-        date: data.date ? new Date(data.date) : undefined,
-        amount: data.amount ? (BigInt(Math.round(data.amount * 100)) as any) : undefined,
+        data: data.data ? new Date(data.data) : undefined,
+        quantia: data.quantia ? (BigInt(Math.round(data.quantia * 100)) as any) : undefined,
       },
-      include: { category: true },
+      include: { categoria: true },
     });
 
     return res.json({ success: true, data: updated });
@@ -138,21 +138,21 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// DELETE /api/transactions/:id
+// DELETE /api/movimentacoes/:id
 router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
-    const transaction = await prisma.transaction.findFirst({
+    const movimentacao = await prisma.movimentacao.findFirst({
       where: { id, userId },
     });
 
-    if (!transaction) {
-      return res.status(404).json({ success: false, error: "Transaction not found" });
+    if (!movimentacao) {
+      return res.status(404).json({ success: false, error: "Movimentação não encontrada" });
     }
 
-    await prisma.transaction.delete({ where: { id } });
+    await prisma.movimentacao.delete({ where: { id } });
 
     return res.json({ success: true, data: { id } });
 
@@ -161,4 +161,4 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-export const transactionsRouter = router;
+export const movimentacoesRouter = router;

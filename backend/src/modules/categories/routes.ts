@@ -8,7 +8,7 @@ const router = Router();
 
 // Validation schema
 const categorySchema = z.object({
-  name: z.string().min(1, "Category name is required"),
+  nome: z.string().min(1, "O nome da categoria é obrigatório"),
   color: z.string().optional(),
   icon: z.string().optional(),
 });
@@ -18,9 +18,9 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
 
-    const categories = await prisma.category.findMany({
+    const categories = await prisma.categoria.findMany({
       where: { userId },
-      orderBy: { name: "asc" },
+      orderBy: { nome: "asc" },
     });
 
     return res.json({ success: true, data: categories });
@@ -35,12 +35,12 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
-    const category = await prisma.category.findFirst({
+    const category = await prisma.categoria.findFirst({
       where: { id, userId },
     });
 
     if (!category) {
-      return res.status(404).json({ success: false, error: "Category not found" });
+      return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
     return res.json({ success: true, data: category });
@@ -55,7 +55,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
     const userId = req.user?.id;
     const data = categorySchema.parse(req.body);
 
-    const category = await prisma.category.create({
+    const category = await prisma.categoria.create({
       //cria a categoria associada ao usuário autenticado utilizando os dados validados do corpo da requisição
       data: { ...data, userId: userId! },
     });
@@ -66,7 +66,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
       return res.status(400).json({ success: false, error: error.errors[0].message });
     }
     if (error.code === "P2002") {
-      return res.status(400).json({ success: false, error: "Category name already exists" });
+      return res.status(400).json({ success: false, error: "Uma categoria com esse nome já existe" });
     }
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
@@ -79,15 +79,15 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
     const userId = req.user?.id;
     const data = categorySchema.partial().parse(req.body);
 
-    const category = await prisma.category.findFirst({
+    const category = await prisma.categoria.findFirst({
       where: { id, userId },
     });
 
     if (!category) {
-      return res.status(404).json({ success: false, error: "Category not found" });
+      return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
-    const updated = await prisma.category.update({
+    const updated = await prisma.categoria.update({
       where: { id },
       data,
     });
@@ -108,27 +108,27 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
-    const category = await prisma.category.findFirst({
+    const category = await prisma.categoria.findFirst({
       where: { id, userId },
     });
 
     if (!category) {
-      return res.status(404).json({ success: false, error: "Category not found" });
+      return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
     // Check if category has transactions
-    const transactionCount = await prisma.transaction.count({
-      where: { categoryId: id },
+    const transactionCount = await prisma.movimentacao.count({
+      where: { categoriaId: id },
     });
 
     if (transactionCount > 0) {
       return res.status(400).json({
         success: false,
-        error: "Não é possivel excluir a categoria com transações existentes. Exclua as transações primeiro.",
+        error: "Não é possível excluir a categoria com movimentações existentes. Exclua as movimentações primeiro.",
       });
     }
 
-    await prisma.category.delete({ where: { id } });
+    await prisma.categoria.delete({ where: { id } });
 
     return res.json({ success: true, data: { id } });
 
@@ -138,51 +138,5 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
 
   }
 });
-
-/*
-router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params as { id: string };
-    const userId = req.user?.id;
-
-    const category = await prisma.category.findFirst({
-      where: { id, userId },
-    });
-
-    if (!category) {
-      return res.status(404).json({
-        success: false,
-        error: "Category not found",
-      });
-    }
-
-    const transactionCount = await prisma.transaction.count({
-      where: { categoryId: id },
-    });
-
-    if (transactionCount > 0) {
-      return res.status(400).json({
-        success: false,
-        error: "Não é possivel excluir a categoria com transações existentes.",
-      });
-    }
-
-    await prisma.category.delete({
-      where: { id },
-    });
-
-    return res.json({
-      success: true,
-      data: { id },
-    });
-
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      error: "Internal server error",
-    });
-  }
-});
-*/
 
 export const categoriesRouter = router;
