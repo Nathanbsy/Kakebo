@@ -5,8 +5,8 @@ import { config } from "./config";
 import { authMiddleware, errorMiddleware } from "./shared/utils/middleware";
 import { authRouter } from "./modules/auth/routes";
 import { movimentacoesRouter } from "./modules/transactions/routes";
-import { categoriesRouter } from "./modules/categories/routes";
-import { reportsRouter } from "./modules/reports/routes";
+import { categoriasRouter } from "./modules/categories/routes";
+import { relatoriosRouter } from "./modules/reports/routes";
 
 const app = express();
 
@@ -33,8 +33,8 @@ const apiPrefix = config.api.prefix;
 
 app.use(`${apiPrefix}/auth`, authRouter);
 app.use(`${apiPrefix}/movimentacoes`, authMiddleware, movimentacoesRouter);
-app.use(`${apiPrefix}/categorias`, authMiddleware, categoriesRouter);
-app.use(`${apiPrefix}/relatorios`, authMiddleware, reportsRouter);
+app.use(`${apiPrefix}/categorias`, authMiddleware, categoriasRouter);
+app.use(`${apiPrefix}/relatorios`, authMiddleware, relatoriosRouter);
 
 // 404 handler
 app.use((req, res) => {

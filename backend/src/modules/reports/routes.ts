@@ -15,10 +15,10 @@ router.get("/mensal", authMiddleware, async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
-    const { year = new Date().getFullYear(), month = new Date().getMonth() + 1 } = req.query;
+    const { ano = new Date().getFullYear(), mes = new Date().getMonth() + 1 } = req.query;
 
-    const startDate = new Date(Number(year), Number(month) - 1, 1);
-    const endDate = new Date(Number(year), Number(month), 0, 23, 59, 59);
+    const startDate = new Date(Number(ano), Number(mes) - 1, 1);
+    const endDate = new Date(Number(ano), Number(mes), 0, 23, 59, 59);
 
     // Get movimentacoes
     const movimentacoes = await prisma.movimentacao.findMany({
@@ -58,7 +58,7 @@ router.get("/mensal", authMiddleware, async (req: Request, res: Response) => {
     return res.json({
       success: true,
       data: {
-        period: `${year}-${String(month).padStart(2, "0")}`,
+        period: `${ano}-${String(mes).padStart(2, "0")}`,
         summary: {
           receita,
           despesa,
@@ -83,10 +83,10 @@ router.get("/anual", authMiddleware, async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, error: "Unauthorized" });
     }
 
-    const { year = new Date().getFullYear() } = req.query;
+    const { ano = new Date().getFullYear() } = req.query;
 
-    const startDate = new Date(Number(year), 0, 1);
-    const endDate = new Date(Number(year), 11, 31, 23, 59, 59);
+    const startDate = new Date(Number(ano), 0, 1);
+    const endDate = new Date(Number(ano), 11, 31, 23, 59, 59);
 
     const movimentacoes = await prisma.movimentacao.findMany({
       where: {
@@ -108,13 +108,13 @@ router.get("/anual", authMiddleware, async (req: Request, res: Response) => {
       .filter((t) => t.tipo === "despesa")
       .reduce((sum, t) => sum + Number(t.quantia), 0);
 
-    // Group by month com tipos corretos
+    // agrupamento por mes
     const porMes = Array(12)
       .fill(null)
       .reduce(
         (acc, _, i) => {
-          const monthKey = String(i + 1).padStart(2, "0");
-          acc[monthKey] = {
+          const mes = String(i + 1).padStart(2, "0");
+          acc[mes] = {
             receita: 0,
             despesa: 0,
             saldo: 0,
@@ -125,19 +125,19 @@ router.get("/anual", authMiddleware, async (req: Request, res: Response) => {
       );
 
     movimentacoes.forEach((t) => {
-      const monthKey = String(t.data.getMonth() + 1).padStart(2, "0");
+      const mes = String(t.data.getMonth() + 1).padStart(2, "0");
       if (t.tipo === "receita") {
-        porMes[monthKey].receita += Number(t.quantia);
+        porMes[mes].receita += Number(t.quantia);
       } else {
-        porMes[monthKey].despesa += Number(t.quantia);
+        porMes[mes].despesa += Number(t.quantia);
       }
-      porMes[monthKey].saldo = porMes[monthKey].receita - porMes[monthKey].despesa;
+      porMes[mes].saldo = porMes[mes].receita - porMes[mes].despesa;
     });
 
     return res.json({
       success: true,
       data: {
-        year,
+        ano,
         summary: {
           receita,
           despesa,
@@ -151,4 +151,4 @@ router.get("/anual", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-export const reportsRouter = router;
+export const relatoriosRouter = router;

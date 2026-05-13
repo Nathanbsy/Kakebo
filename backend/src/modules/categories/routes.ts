@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 const router = Router();
 
 // Validation schema
-const categorySchema = z.object({
+const categoriaSchema = z.object({
   nome: z.string().min(1, "O nome da categoria é obrigatório"),
   color: z.string().optional(),
   icon: z.string().optional(),
@@ -18,12 +18,12 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
 
-    const categories = await prisma.categoria.findMany({
+    const categorias = await prisma.categoria.findMany({
       where: { userId },
       orderBy: { nome: "asc" },
     });
 
-    return res.json({ success: true, data: categories });
+    return res.json({ success: true, data: categorias });
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
@@ -35,15 +35,15 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
-    const category = await prisma.categoria.findFirst({
+    const categoria = await prisma.categoria.findFirst({
       where: { id, userId },
     });
 
-    if (!category) {
+    if (!categoria) {
       return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
-    return res.json({ success: true, data: category });
+    return res.json({ success: true, data: categoria });
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
@@ -53,14 +53,14 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    const data = categorySchema.parse(req.body);
+    const data = categoriaSchema.parse(req.body);
 
-    const category = await prisma.categoria.create({
+    const categoria = await prisma.categoria.create({
       //cria a categoria associada ao usuário autenticado utilizando os dados validados do corpo da requisição
       data: { ...data, userId: userId! },
     });
 
-    return res.status(201).json({ success: true, data: category });
+    return res.status(201).json({ success: true, data: categoria });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
@@ -77,13 +77,13 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
-    const data = categorySchema.partial().parse(req.body);
+    const data = categoriaSchema.partial().parse(req.body);
 
-    const category = await prisma.categoria.findFirst({
+    const categoria = await prisma.categoria.findFirst({
       where: { id, userId },
     });
 
-    if (!category) {
+    if (!categoria) {
       return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
@@ -108,20 +108,20 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
     const { id } = req.params as { id: string };
     const userId = req.user?.id;
 
-    const category = await prisma.categoria.findFirst({
+    const categoria = await prisma.categoria.findFirst({
       where: { id, userId },
     });
 
-    if (!category) {
+    if (!categoria) {
       return res.status(404).json({ success: false, error: "Categoria não encontrada" });
     }
 
-    // Check if category has transactions
-    const transactionCount = await prisma.movimentacao.count({
+    // verifica se a categoria tem movimentacoes
+    const movimentacaoCount = await prisma.movimentacao.count({
       where: { categoriaId: id },
     });
 
-    if (transactionCount > 0) {
+    if (movimentacaoCount > 0) {
       return res.status(400).json({
         success: false,
         error: "Não é possível excluir a categoria com movimentações existentes. Exclua as movimentações primeiro.",
@@ -139,4 +139,4 @@ router.delete("/:id", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-export const categoriesRouter = router;
+export const categoriasRouter = router;
