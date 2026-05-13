@@ -1,12 +1,9 @@
-/**
- * Reports page
- */
 "use client";
 
 import { useState } from "react";
 
-export default function ReportsPage() {
-  const [reportType, setReportType] = useState("monthly");
+export default function RelatoriosPage() {
+  const [relatorioTipo, setRelatorioTipo] = useState("monthly");
 
   return (
     <div className="space-y-6">
@@ -15,13 +12,13 @@ export default function ReportsPage() {
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="flex gap-4 mb-6">
           <select
-            value={reportType}
-            onChange={(e) => setReportType(e.target.value)}
+            value={relatorioTipo}
+            onChange={(e) => setRelatorioTipo(e.target.value)}
             className="px-4 py-2 border rounded-md"
           >
-            <option value="monthly">Mensal</option>
-            <option value="yearly">Anual</option>
-            <option value="custom">Personalizado</option>
+            <option value="mensal">Mensal</option>
+            <option value="anual">Anual</option>
+            <option value="semanal">Semanal</option>
           </select>
           <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Exportar

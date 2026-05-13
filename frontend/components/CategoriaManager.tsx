@@ -5,7 +5,7 @@ interface Props {
   categorias: Categoria[];
 }
 
-export default function CategoryManager({ categorias }: Props) {
+export default function CategoriaManager({ categorias }: Props) {
   const [showForm, setShowForm] = useState(false);
 
   return (

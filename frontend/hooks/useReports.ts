@@ -4,8 +4,8 @@
 import { useState, useCallback } from "react";
 
 export function useReports() {
-  const [monthlyReport, setMonthlyReport] = useState(null);
-  const [yearlyReport, setYearlyReport] = useState(null);
+  const [relatorioMensal, setRelatorioMensal] = useState(null);
+  const [relatorioAnual, setRelatorioAnual] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,7 +13,7 @@ export function useReports() {
     try {
       setLoading(true);
       // const response = await api.get(`/reports/monthly?month=${month}&year=${year}`);
-      // setMonthlyReport(response.data);
+      // setRelatorioMensal(response.data);
       setError(null);
     } catch (err) {
       setError("Failed to fetch monthly report");
@@ -26,7 +26,7 @@ export function useReports() {
     try {
       setLoading(true);
       // const response = await api.get(`/reports/yearly?year=${year}`);
-      // setYearlyReport(response.data);
+      // setRelatorioAnual(response.data);
       setError(null);
     } catch (err) {
       setError("Failed to fetch yearly report");
@@ -36,8 +36,8 @@ export function useReports() {
   }, []);
 
   return {
-    monthlyReport,
-    yearlyReport,
+    relatorioMensal,
+    relatorioAnual,
     loading,
     error,
     fetchMonthlyReport,

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import CategoryManager from "../../../components/CategoryManager";
+import CategoryManager from "@/frontend/components/CategoriaManager";
 
-export default function CategoriesPage() {
+export default function CategoriasPage() {
   const [categorias] = useState([]);
 
   return (

@@ -1,11 +1,8 @@
-/**
- * Dashboard page
- */
 "use client";
 
-import MonthlySpending from "@/components/Charts/MonthlySpending";
-import CategoryBreakdown from "@/components/Charts/CategoryBreakdown";
-import TrendAnalysis from "@/components/Charts/TrendAnalysis";
+import MonthlySpending from "@/frontend/components/Charts/MensalSpending";
+import CategoryBreakdown from "@/frontend/components/Charts/CategoriaBreakdown";
+import TrendAnalysis from "@/frontend/components/Charts/TrendAnalysis";
 
 export default function DashboardPage() {
   return (

@@ -1,8 +1,8 @@
 /**
  * Dashboard layout
  */
-import Sidebar from "@/components/Sidebar";
-import Header from "@/components/Header";
+import Sidebar from "@/frontend/components/Sidebar";
+import Header from "@/frontend/components/Header";
 
 export default function DashboardLayout({
   children,
