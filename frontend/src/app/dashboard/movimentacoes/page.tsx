@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import MovimentacaoForm from "@/frontend/src/components/MovimentacaoForm";
-import MovimentacaoList from "@/frontend/src/components/MovimentacaoList";
+import MovimentacaoForm from "@/src/components/MovimentacaoForm";
+import MovimentacaoList from "@/src/components/MovimentacaoList";
 
 export default function MovimentacoesPage() {
   const [mostraForm, setMostraForm] = useState(false);

@@ -2,7 +2,7 @@
 
 import { BarChart, FileSpreadsheet, Settings, WalletMinimal } from 'lucide-react';
 import './globals.css'
-import Card from "@/frontend/src/components/Card";
+import Card from "@/src/components/Card";
 
 export default function HomePage() {
   return (

@@ -1,8 +1,8 @@
 "use client";
 
-import MensalSpending from "@/frontend/src/components/Charts/MensalSpending";
-import CategoriaBreakdown from "@/frontend/src/components/Charts/CategoriaBreakdown";
-import TrendAnalysis from "@/frontend/src/components/Charts/TrendAnalysis";
+import MensalSpending from "@/src/components/Charts/MensalSpending";
+import CategoriaBreakdown from "@/src/components/Charts/CategoriaBreakdown";
+import TrendAnalysis from "@/src/components/Charts/TrendAnalysis";
 import Cookies from "js-cookie";
 
 export default function DashboardPage() {
