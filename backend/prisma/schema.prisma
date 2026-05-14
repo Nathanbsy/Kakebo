@@ -24,6 +24,7 @@ model Usuario {
   movimentacoes Movimentacao[]
   categorias   Categoria[]
   reports      Relatorio[]
+  historicoReflexoes HistoricoReflexao[]
 
   @@map("usuarios")
 }
@@ -78,6 +79,7 @@ model HistoricoReflexao {
   id        String   @id @default(cuid())
   userId    String
   user      Usuario     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mes      String
   comentario   String
   dataCriacao DateTime @default(now())
   dataAtualizacao DateTime @updatedAt

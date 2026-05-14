@@ -10,20 +10,20 @@ declare global {
   }
 }
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    const token = req.cookies.access_token;
 
     if (!token) {
-      return res.status(401).json({ success: false, error: "Missing or invalid token" });
+      res.status(401).json({ success: false, error: "Missing or invalid token" });
+      return;
     }
 
     const decoded = tokenUtils.verifyToken(token);
     req.user = decoded;
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, error: "Invalid token" });
+    res.status(401).json({ success: false, error: "Invalid token" });
   }
 };
 

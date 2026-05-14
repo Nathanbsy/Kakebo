@@ -10,7 +10,10 @@ import { relatoriosRouter } from "./modules/relatorios/routes";
 
 const app = express();
 
-app.use(cors(config.cors));
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
