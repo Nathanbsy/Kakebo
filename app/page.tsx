@@ -1,37 +1,17 @@
 "use client";
 
-import MensalSpending from "@/frontend/components/Charts/MensalSpending";
-import CategoriaBreakdown from "@/frontend/components/Charts/CategoriaBreakdown";
-import TrendAnalysis from "@/frontend/components/Charts/TrendAnalysis";
+import { BarChart, FileSpreadsheet, Settings, WalletMinimal } from 'lucide-react';
 import './globals.css'
+import Card from "@/frontend/components/Card";
 
-export default function DashboardPage() {
+export default function HomePage() {
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-gray-600 text-sm">Total Gasto Este Mês</p>
-          <p className="text-3xl font-bold text-gray-900">R$ 0,00</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-gray-600 text-sm">Total de Transações</p>
-          <p className="text-3xl font-bold text-gray-900">0</p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <p className="text-gray-600 text-sm">Orçamento Disponível</p>
-          <p className="text-3xl font-bold text-gray-900">R$ 0,00</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MensalSpending />
-        <CategoriaBreakdown />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6">
-        <TrendAnalysis />
+    <div className="w-full h-full flex flex-col items-center space-y-6 p-6 ">
+      <div className="w-full h-full flex justify-center items-center gap-6 flex-wrap">
+        <Card titulo="Seus Gastos & Ganhos" pagina="/dashboard" corBg="#065F46" corBgLight="#10B981" corShadow="rgba(16, 185, 129, 0.45)" icon={<BarChart size={32} color='white'/>} />
+        <Card titulo="Configurações" pagina="/dashboard/configuracoes" corBg="#334155" corBgLight="#94A3B8" corShadow="rgba(51, 65, 85, 0.45)" icon={<Settings size={32} color='white'/>} />
+        <Card titulo="Relatórios" pagina="/dashboard/relatorios" corBg="#5B21B6" corBgLight="#A855F7" corShadow="rgba(168, 85, 247, 0.45)" icon={<FileSpreadsheet size={32} color='white'/>} />
+        <Card titulo="Movimentações" pagina="/dashboard/movimentacoes" corBg="#B45309" corBgLight="#F59E0B" corShadow="rgba(245, 158, 11, 0.45)" icon={<WalletMinimal size={32} color='white'/>} />
       </div>
     </div>
   );

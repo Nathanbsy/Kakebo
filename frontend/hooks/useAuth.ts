@@ -51,6 +51,7 @@ export function useAuth() {
 
   const logout = () => {
     Cookies.remove("access_token");
+    Cookies.remove("refresh_token");
     Cookies.remove("user");
     setUser(null);
   };
