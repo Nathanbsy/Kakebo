@@ -6,6 +6,7 @@ import * as bcrypt from "bcryptjs";
 import { AuthResponse } from "../../shared/types";
 import jwt from "jsonwebtoken";
 import { config } from "../../config";
+import Cookies from "js-cookie";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -93,6 +94,42 @@ router.post("/login", async (req: Request, res: Response) => {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
     }
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+router.get("/refresh", async (req: Request, res: Response) => {
+  try {
+    const refreshToken = Cookies.get("refresh_token");
+    if (!refreshToken) {
+      return res.status(401).json({ success: false, error: "Refresh token não fornecido" });
+    }
+
+    const decoded: any = jwt.verify(refreshToken, config.jwt.refreshSecret);
+    const user = await prisma.usuario.findUnique({ where: { id: decoded.id } });
+    if (!user) {
+      return res.status(401).json({ success: false, error: "Usuário não encontrado" });
+    }
+
+    // gera um novo token de autenticação
+    const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: "24h" });
+
+    const response: AuthResponse = {
+      token,
+      refreshToken,
+      user: { id: user.id, email: user.email, nome: user.nome },
+    };
+
+    Cookies.set("access_token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      expires: 1, 
+    });
+
+    return res.json({ success: true, data: response });
+  }
+  catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });

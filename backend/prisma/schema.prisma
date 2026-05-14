@@ -16,6 +16,8 @@ model Usuario {
   email     String     @unique
   senha     String
   nome      String
+  rendaMensal Decimal    @db.Decimal(10, 2) @default(0)
+  metaEconomiaMensal Decimal    @db.Decimal(10, 2) @default(0)
   dataCriacao DateTime   @default(now())
   dataAtualizacao DateTime   @updatedAt
 
@@ -70,4 +72,15 @@ model Relatorio {
   dataAtualizacao DateTime @updatedAt
 
   @@map("relatorios")
+}
+
+model HistoricoReflexao {
+  id        String   @id @default(cuid())
+  userId    String
+  user      Usuario     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comentario   String
+  dataCriacao DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  @@map("historico_reflexoes")
 }

@@ -2,6 +2,8 @@ export interface User {
   id: string;
   email: string;
   nome?: string;
+  rendaMensal: number;
+  metaEconomiaMensal: number;
   dataCriacao: string;
 }
 
@@ -34,8 +36,16 @@ export interface Relatorio {
   dataCriacao: string;
 }
 
+export interface HistoricoReflexao {
+  id: string;
+  userId: string;
+  comentario: string;
+  dataCriacao: string;
+}
+
 export interface AuthResponse {
   access_token: string;
+  refresh_token: string;
   token_type: string;
   user: User;
 }

@@ -1,6 +1,4 @@
-/**
- * Authentication hook
- */
+"use client";
 import { useState, useEffect } from "react";
 import { User } from "../types";
 import axios from "axios";
@@ -12,7 +10,7 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if user is logged in on mount
+    // verifica se o usuario ja esta logado nos cookies
     const token = Cookies.get("access_token");
     const userData = Cookies.get("user");
 
@@ -26,7 +24,7 @@ export function useAuth() {
     try {
       setLoading(true);
       const res = await axios.post("/api/auth/login", { email, password });
-      const { token, user } = res.data.data;
+      const { token, refreshToken, user } = res.data.data;
       Cookies.set("access_token", token, {
         httpOnly: true,
         secure: true,
@@ -36,6 +34,13 @@ export function useAuth() {
         expires: 1, 
       });
       Cookies.set("user", JSON.stringify(user));
+      Cookies.set("refresh_token", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        expires: 7, 
+      });
+      setUser(user);
       setError(null);
     } catch (err) {
       setError("Falha ao realizar o login");

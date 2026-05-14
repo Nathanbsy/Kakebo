@@ -15,9 +15,11 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const escrever = (evento: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [evento.target.name]: evento.target.value
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,7 +43,7 @@ export default function RegisterPage() {
               type="text"
               name="name"
               value={formData.name}
-              onChange={handleChange}
+              onChange={escrever}
               placeholder="Nome"
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
@@ -49,7 +51,7 @@ export default function RegisterPage() {
               type="email"
               name="email"
               value={formData.email}
-              onChange={handleChange}
+              onChange={escrever}
               placeholder="Email"
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required
@@ -58,7 +60,7 @@ export default function RegisterPage() {
               type="password"
               name="password"
               value={formData.password}
-              onChange={handleChange}
+              onChange={escrever}
               placeholder="Senha"
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required
@@ -67,7 +69,7 @@ export default function RegisterPage() {
               type="password"
               name="confirmPassword"
               value={formData.confirmPassword}
-              onChange={handleChange}
+              onChange={escrever}
               placeholder="Confirmar Senha"
               className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required

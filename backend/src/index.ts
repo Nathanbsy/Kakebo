@@ -4,9 +4,9 @@ import cookieParser from "cookie-parser";
 import { config } from "./config";
 import { authMiddleware, errorMiddleware } from "./shared/utils/middleware";
 import { authRouter } from "./modules/auth/routes";
-import { movimentacoesRouter } from "./modules/transactions/routes";
-import { categoriasRouter } from "./modules/categories/routes";
-import { relatoriosRouter } from "./modules/reports/routes";
+import { movimentacoesRouter } from "./modules/movimentacoes/routes";
+import { categoriasRouter } from "./modules/categorias/routes";
+import { relatoriosRouter } from "./modules/relatorios/routes";
 
 const app = express();
 
