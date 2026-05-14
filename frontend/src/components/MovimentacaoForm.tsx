@@ -10,7 +10,7 @@ export default function MovimentacaoForm() {
   });
 
   //depois subistituir essa bomba por aquela coisinha do bao
-  const handleChange = (
+  const escrever = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
     >
@@ -34,7 +34,7 @@ export default function MovimentacaoForm() {
           type="number"
           name="quantia"
           value={formData.quantia}
-          onChange={handleChange}
+          onChange={escrever}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
         />
@@ -46,7 +46,7 @@ export default function MovimentacaoForm() {
         <textarea
           name="descricao"
           value={formData.descricao}
-          onChange={handleChange}
+          onChange={escrever}
           className="mt-1 block w-full rounded-md border-gray-300"
         />
       </div>
@@ -56,7 +56,7 @@ export default function MovimentacaoForm() {
           type="date"
           name="data"
           value={formData.data}
-          onChange={handleChange}
+          onChange={escrever}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
         />
@@ -68,7 +68,7 @@ export default function MovimentacaoForm() {
         <select
           name="categoria"
           value={formData.categoria}
-          onChange={handleChange}
+          onChange={escrever}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
         >
