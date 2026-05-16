@@ -1,92 +1,152 @@
-
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import api from "../../../services/api";
+import styles from "../../../components/css/auth.module.css";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    name: "",
+    nome: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const escrever = (evento: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [evento.target.name]: evento.target.value
+      [evento.target.name]: evento.target.value,
     });
+    setError(null);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const comparaSenhas = () => {
+    if (formData.password !== formData.confirmPassword) {
+      return false;
+    }
+    return true;
+  }
+
+  const handleSubmit = async (evento: React.FormEvent) => {
+    evento.preventDefault();
+    
+    if (!comparaSenhas()) {
+      setError("As senhas não coincidem");
+      return;
+    }
+
     setLoading(true);
-    // Handle registration
-    setLoading(false);
+    try {
+      const res = await api.post("/auth/register", {
+        nome: formData.nome,
+        email: formData.email,
+        password: formData.password,
+      });
+      
+      if (res.status === 200 || res.status === 201) {
+        setError(null);
+        router.push("/auth/login");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Erro ao registrar");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+      <div className="flex justify-center flex-col gap-8 items-center max-w-md w-full h-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="py-16 text-center text-3xl font-extrabold text-gray-900">
             Registrar no Kakeibo
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm space-y-2">
-            <input
+        <form onSubmit={handleSubmit}>
+          <div className={styles["formulario"] + ' flex justify-center items-center flex-col w-82 h-fit'}>
+            <div className={styles["input-container"]}>
+              <input
               type="text"
-              name="name"
-              value={formData.name}
+              name="nome"
+              id="nome"
+              value={formData.nome}
               onChange={escrever}
-              placeholder="Nome"
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            />
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={escrever}
-              placeholder="Email"
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required
             />
-            <input
+            <label htmlFor="nome" className={styles.label}>
+              Nome
+            </label>
+            <div className={styles.underline}></div>
+            </div>
+            <div className={styles["input-container"]}>
+              
+              <input
+                type="text"
+                name="email"
+                id="email"
+                value={formData.email}
+                onChange={escrever}
+                required
+              />
+              <label htmlFor="email" className={styles.label}>Email</label>
+              <div className={styles.underline}></div>
+            </div>
+            
+            <div className={styles["input-container"]}>
+              <input
               type="password"
               name="password"
+              id="password"
               value={formData.password}
               onChange={escrever}
-              placeholder="Senha"
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required
-            />
-            <input
+              />
+              <label htmlFor="password" className={styles.label}>
+                Senha
+              </label>
+              <div className={styles.underline}></div>
+            </div>
+            
+            <div className={styles["input-container"]}>
+              <input
               type="password"
               name="confirmPassword"
+              id="confirmPassword"
               value={formData.confirmPassword}
               onChange={escrever}
-              placeholder="Confirmar Senha"
-              className="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               required
             />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Registrando..." : "Registrar"}
-          </button>
-          <div className="text-center">
+            <label htmlFor="confirmPassword" className={styles.label}>
+              Confirmar Senha
+            </label>
+            <div className={styles.underline}></div>
+            </div>
+            
+
+            <div className={styles.popup + ' ' + styles["error-popup"] + (error ? '' : ' ' + styles.escondido)}>
+              <div className={styles["error-message"]}>{error || "Erro ao registrar"}</div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-8.5 flex justify-center items-center border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+                {loading ? "Registrando..." : "Registrar"}
+            </button>
+            <div className="text-center">
             <p className="text-sm text-gray-600">
               Já tem conta?{" "}
-              <Link href="/login" className="text-blue-600 hover:text-blue-500">
+              <Link href="/auth/login" className="text-blue-600 hover:text-blue-500">
                 Entrar
               </Link>
             </p>
+          </div>
           </div>
         </form>
       </div>

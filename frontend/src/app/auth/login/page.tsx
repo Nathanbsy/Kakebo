@@ -1,20 +1,33 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
+import styles from "../../../components/css/auth.module.css";
+import { useAuth } from "../../../../hooks/useAuth";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [error, setError] = useState<string | null>(null);
+  const { login } = useAuth();
+  
+  const handleSubmit = async (evento: React.FormEvent) => {
+    evento.preventDefault();
     setLoading(true);
-    // Handle login
-    setLoading(false);
+    setError(null);
+    try {
+      await login(user.email, user.password);
+      router.push("/dashboard");
+    } catch (err) {
+      setError("Falha ao realizar o login");
+    } finally {
+      setLoading(false);
+    }
   };
 
   function escrever(evento: React.ChangeEvent<HTMLInputElement>) {
@@ -22,6 +35,7 @@ export default function LoginPage() {
       ...user,
       [evento.target.name]: evento.target.value
     });
+    setError(null);
   }
 
 
@@ -35,36 +49,35 @@ export default function LoginPage() {
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
-            <div>
+            <div className={styles["input-container"]}>
+              
               <input
                 type="email"
                 value={user.email}
                 onChange={escrever}
                 name="email"
-                placeholder="Email"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                id="email"
+                // className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 required
               />
+              <label htmlFor="email" className={styles.label}>Email</label>
+              <div className={styles.underline}></div>
             </div>
-            <div>
+            
+            <div className={styles["input-container"]}>
+              
               <input
                 type="password"
                 value={user.password}
                 onChange={escrever}
                 name="password"
-                placeholder="Senha"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                id="password"
                 required
               />
+              <label htmlFor="password" className={styles.label}>Senha</label>
+              <div className={styles.underline}></div>
             </div>
-            <div>
-              <input
-                type="password"
-                placeholder="Senha"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
-            </div>
+            
           </div>
           <button
             type="submit"
@@ -73,10 +86,15 @@ export default function LoginPage() {
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
+          {error && (
+            <div className="rounded-md bg-red-50 p-4">
+              <p className="text-sm text-red-800">{error}</p>
+            </div>
+          )}
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Não tem conta?{" "}
-              <Link href="/register" className="text-blue-600 hover:text-blue-500">
+              <Link href="/auth/register" className="text-blue-600 hover:text-blue-500">
                 Registre-se
               </Link>
             </p>

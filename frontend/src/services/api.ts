@@ -48,7 +48,7 @@ api.interceptors.response.use(
       
       Cookies.remove("access_token");
       Cookies.remove("refresh_token");
-      window.location.href = "/login";
+      window.location.href = "/auth/login";
 
       return Promise.reject(err);
     }
