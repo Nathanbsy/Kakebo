@@ -1,13 +1,11 @@
 import * as jwt from "jsonwebtoken";
 import { JWTPayload } from "../types";
 import { Request, Response } from "express";
-
-const JWT_SECRET = process.env.JWT_SECRET_KEY || "your-secret-key-change-in-production";
-const JWT_EXPIRATION = process.env.JWT_EXPIRATION_HOURS || "24";
+import { config } from "../../config";
 
 export const tokenUtils = {
   verifyToken: (token: string): JWTPayload => {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    return jwt.verify(token, config.jwt.secret) as JWTPayload;
   },
 
   decodeToken: (token: string): JWTPayload | null => {
@@ -15,26 +13,22 @@ export const tokenUtils = {
   },
 
   refreshToken: (req: Request, res: Response): string => {
-
-    const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refresh_token;
 
     if (!refreshToken) {
       throw { statusCode: 401, message: "Missing refresh token" };
     }
 
     try {
-      const decoded = tokenUtils.verifyToken(refreshToken);
-
+      const decoded = jwt.verify(refreshToken, config.jwt.refreshSecret) as JWTPayload;
       const payload: JWTPayload = { id: decoded.id, email: decoded.email };
       
-      return jwt.sign(payload, JWT_SECRET, { expiresIn: "24h" });
+      return jwt.sign(payload, config.jwt.secret, { expiresIn: "24h" });
     } catch (error) {
       throw { statusCode: 401, message: "Invalid refresh token" };
     }
-
   }
 };
-
 export const errorHandler = (error: any): { statusCode: number; message: string } => {
   if (error.name === "ZodError") {
     return { statusCode: 400, message: error.errors[0].message };

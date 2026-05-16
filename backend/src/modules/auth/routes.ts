@@ -6,7 +6,6 @@ import * as bcrypt from "bcryptjs";
 import { AuthResponse } from "../../shared/types";
 import jwt from "jsonwebtoken";
 import { config } from "../../config";
-import Cookies from "js-cookie";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -25,7 +24,7 @@ const loginSchema = z.object({
 // POST /api/auth/register
 router.post("/register", async (req: Request, res: Response) => {
   try {
-    const { email, password, nome } = registerSchema.parse(req.body);
+    const { nome, email, password } = registerSchema.parse(req.body);
 
     // Verifica se o usuario já existe
     const existingUser = await prisma.usuario.findUnique({ where: { email } });
@@ -44,14 +43,26 @@ router.post("/register", async (req: Request, res: Response) => {
     // gera o token de autenticação
     const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: "24h" });
     const refreshToken = jwt.sign({ id: user.id, email: user.email }, config.jwt.refreshSecret, { expiresIn: "7d" });
-    
+
+    res.cookie("access_token", token, {
+      secure: false,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000 
+    });
+
+    res.cookie("refresh_token", refreshToken, {
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
     const response: AuthResponse = {
-      token,
-      refreshToken,
+      token: token,
+      refreshToken: refreshToken,
       user: { id: user.id, email: user.email, nome: user.nome },
     };
 
-    return res.status(201).json({ success: true, data: response });
+    return res.status(200).json({ success: true, data: response });
   } catch (error: any) {
     if (error.name === "ZodError") {
       return res.status(400).json({ success: false, error: error.errors[0].message });
@@ -83,10 +94,23 @@ router.post("/login", async (req: Request, res: Response) => {
 
 
     const response: AuthResponse = {
-      token,
-      refreshToken,
+      token: token,
+      refreshToken: refreshToken,
       user: { id: user.id, email: user.email, nome: user.nome },
     };
+    
+    res.cookie("access_token", token, {
+      secure: false,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000
+    });
+    res.cookie("refresh_token", refreshToken, {
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    });
+
+    console.log(req.cookies);
 
     return res.json({ success: true, data: response });
     
@@ -98,9 +122,21 @@ router.post("/login", async (req: Request, res: Response) => {
   }
 });
 
+router.post("/logout", async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("access_token");
+    res.clearCookie("refresh_token");
+    res.clearCookie("user");
+    return res.json({ success: true, message: "Logout realizado com sucesso" });
+  }
+  catch (error) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
 router.get("/refresh", async (req: Request, res: Response) => {
   try {
-    const refreshToken = Cookies.get("refresh_token");
+    const refreshToken = req.cookies.refresh_token;
     if (!refreshToken) {
       return res.status(401).json({ success: false, error: "Refresh token não fornecido" });
     }
@@ -110,26 +146,36 @@ router.get("/refresh", async (req: Request, res: Response) => {
     if (!user) {
       return res.status(401).json({ success: false, error: "Usuário não encontrado" });
     }
+    
 
     // gera um novo token de autenticação
     const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: "24h" });
+    const newRefreshToken = jwt.sign({ id: user.id, email: user.email }, config.jwt.refreshSecret, { expiresIn: "7d" });
 
     const response: AuthResponse = {
-      token,
-      refreshToken,
+      token: token,
+      refreshToken: newRefreshToken,
       user: { id: user.id, email: user.email, nome: user.nome },
     };
 
-    Cookies.set("access_token", token, {
-      httpOnly: true,
-      secure: true,
+    res.cookie("access_token", token, {
+      secure: false,
       sameSite: "lax",
-      expires: 1, 
+      maxAge: 24 * 60 * 60 * 1000
+    });
+    
+    res.cookie("refresh_token", newRefreshToken, {
+      secure: false,
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000
     });
 
     return res.json({ success: true, data: response });
   }
-  catch (error) {
+  catch (error: any) {
+    if (error.name === "JsonWebTokenError") {
+      return res.status(401).json({ success: false, error: "Refresh token inválido" });
+    }
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
 });

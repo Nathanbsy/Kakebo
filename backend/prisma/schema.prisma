@@ -19,7 +19,7 @@ model Usuario {
   rendaMensal Decimal    @db.Decimal(10, 2) @default(0)
   metaEconomiaMensal Decimal    @db.Decimal(10, 2) @default(0)
   dataCriacao DateTime   @default(now())
-  dataAtualizacao DateTime   @updatedAt
+  dataAtualizacao DateTime?   @updatedAt
 
   movimentacoes Movimentacao[]
   categorias   Categoria[]
@@ -37,7 +37,7 @@ model Categoria {
   color     String?    @default("#000000")
   icon      String?
   dataCriacao DateTime   @default(now())
-  dataAtualizacao DateTime   @updatedAt
+  dataAtualizacao DateTime?   @updatedAt
 
   movimentacoes Movimentacao[]
 
@@ -53,11 +53,11 @@ model Movimentacao {
   categoria    Categoria @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
   quantia      Decimal  @db.Decimal(10, 2)
   descricao String?
-  data        DateTime
+  data        DateTime @default(now())
   tipo        String   // "receita" | "despesa"
   metodo      String?  // "dinheiro" | "cartão" | "transferência_bancária"
   dataCriacao   DateTime @default(now())
-  dataAtualizacao   DateTime @updatedAt
+  dataAtualizacao   DateTime? @updatedAt
 
   @@map("movimentacoes")
 }
@@ -70,7 +70,7 @@ model Relatorio {
   tipo      String   // "mensal" | "anual" | "categoria" | "semanal"
   dados      Json
   dataCriacao DateTime @default(now())
-  dataAtualizacao DateTime @updatedAt
+  dataAtualizacao DateTime? @updatedAt
 
   @@map("relatorios")
 }
@@ -82,7 +82,7 @@ model HistoricoReflexao {
   mes      String
   comentario   String
   dataCriacao DateTime @default(now())
-  dataAtualizacao DateTime @updatedAt
+  dataAtualizacao DateTime? @updatedAt
 
   @@map("historico_reflexoes")
 }

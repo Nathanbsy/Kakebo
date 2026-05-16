@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 import { config } from "./config";
 import { authMiddleware, errorMiddleware } from "./shared/utils/middleware";
 import { authRouter } from "./modules/auth/routes";
@@ -10,6 +11,7 @@ import { relatoriosRouter } from "./modules/relatorios/routes";
 
 const app = express();
 
+app.use(morgan("dev"));
 app.use(cors({
   origin: "http://localhost:3000",
   credentials: true,
