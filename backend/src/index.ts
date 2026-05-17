@@ -1,6 +1,5 @@
 import express from "express";
 import cors from "cors";
-import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { config } from "./config";
 import { authMiddleware, errorMiddleware } from "./shared/utils/middleware";
@@ -8,6 +7,8 @@ import { authRouter } from "./modules/auth/routes";
 import { movimentacoesRouter } from "./modules/movimentacoes/routes";
 import { categoriasRouter } from "./modules/categorias/routes";
 import { relatoriosRouter } from "./modules/relatorios/routes";
+import { usuarioRouter } from "./modules/usuario/routes";
+import cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.get("/saude", (req, res) => {
 const apiPrefix = config.api.prefix;
 
 app.use(`${apiPrefix}/auth`, authRouter);
+app.use(`${apiPrefix}/me`, authMiddleware, usuarioRouter);
 app.use(`${apiPrefix}/movimentacoes`, authMiddleware, movimentacoesRouter);
 app.use(`${apiPrefix}/categorias`, authMiddleware, categoriasRouter);
 app.use(`${apiPrefix}/relatorios`, authMiddleware, relatoriosRouter);
