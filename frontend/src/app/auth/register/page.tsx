@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "../../../services/api";
 import styles from "../../../components/css/auth.module.css";
+import Cookies from "js-cookie";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -16,6 +17,15 @@ export default function RegisterPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isUserLoggedIn = () => {
+    const token = Cookies.get("access_token");
+    return !!token;
+  }
+
+  if (isUserLoggedIn()) {
+    router.push("/");
+  }
 
   const escrever = (evento: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({

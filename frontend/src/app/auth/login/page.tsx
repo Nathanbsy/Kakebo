@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "../../../components/css/auth.module.css";
 import { useAuth } from "../../../../hooks/useAuth";
+import Cookies from "js-cookie";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,6 +16,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { login } = useAuth();
+
+  const isUserLoggedIn = () => {
+    const token = Cookies.get("access_token");
+    return !!token;
+  }
+
+  if (isUserLoggedIn()) {
+    router.push("/");
+  }
   
   const handleSubmit = async (evento: React.FormEvent) => {
     evento.preventDefault();
@@ -22,7 +32,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await login(user.email, user.password);
-      router.push("/dashboard");
+      router.push("/");
     } catch (err) {
       setError("Falha ao realizar o login");
     } finally {
@@ -37,7 +47,6 @@ export default function LoginPage() {
     });
     setError(null);
   }
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
