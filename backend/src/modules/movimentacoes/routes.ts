@@ -72,6 +72,7 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
 // POST /api/movimentacoes
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
   try {
+    
     const userId = req.user?.id;
     const data = movimentacaoSchema.parse(req.body);
 

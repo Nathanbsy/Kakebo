@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CategoryManager from "@/src/components/CategoriaManager";
+import api from "@/src/services/api";
 
 export default function CategoriasPage() {
-  const [categorias] = useState([]);
+  const [categorias, setCategorias] = useState([]);
+
+  useEffect(() => {
+    api.get("/categorias")
+      .then((resposta) => {
+        setCategorias(resposta.data);
+      })
+      .catch((erro) => {
+        console.error(erro);
+      });
+  }, []);
 
   return (
     <div className="space-y-6">

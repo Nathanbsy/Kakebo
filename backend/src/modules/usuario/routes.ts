@@ -2,16 +2,15 @@ import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { config } from "../../config";
+import { authMiddleware } from "../../shared/utils/middleware";
 
 const prisma = new PrismaClient();
 const router = Router();
 
-router.get("/", async (req: Request, res: Response) => {
+router.get("/", authMiddleware, async (req: Request, res: Response) => {
     const token = req.cookies.access_token;
     console.log("Token recebido:", token); // Log do token recebido
-    if (!token) {
-        return res.status(401).json({ success: false, error: "Token de autenticação ausente" });
-    }
+   
 
     try {
         const decoded: any = jwt.verify(token, config.jwt.secret);
@@ -23,11 +22,9 @@ router.get("/", async (req: Request, res: Response) => {
     }
 });
 
-router.put("/", async (req: Request, res: Response) => {
+router.put("/", authMiddleware, async (req: Request, res: Response) => {
     const token = req.cookies.access_token;
-    if (!token) {
-        return res.status(401).json({ success: false, error: "Token de autenticação ausente" });
-    }
+
     try {
         const decoded: any = jwt.verify(token, config.jwt.secret);
         const { nome, email, rendaMensal, metaEconomiaMensal } = req.body;

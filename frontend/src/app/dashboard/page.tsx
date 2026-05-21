@@ -6,6 +6,7 @@ import TrendAnalysis from "@/src/components/Charts/TrendAnalysis";
 import Cookies from "js-cookie";
 
 export default function DashboardPage() {
+  
   const user = Cookies.get("user") ? JSON.parse(Cookies.get("user")!) : null;
 
   var totalGastoMes: number = 0;

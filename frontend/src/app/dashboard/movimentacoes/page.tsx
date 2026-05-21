@@ -1,16 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MovimentacaoForm from "@/src/components/MovimentacaoForm";
 import MovimentacaoList from "@/src/components/MovimentacaoList";
+import api from "@/src/services/api";
 
 export default function MovimentacoesPage() {
   const [mostraForm, setMostraForm] = useState(false);
-  const [movimentacoes] = useState([]);
+  const [movimentacoes, setMovimentacoes] = useState([]);
+
+  useEffect(() => {
+    api.get("/movimentacao")
+      .then((resposta) => {
+        setMovimentacoes(resposta.data);
+      })
+      .catch((erro) => {
+        console.error(erro);
+      });
+  }, []);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center gap-6">
         <h1 className="text-3xl font-bold text-gray-900">Movimentações</h1>
         <button
           onClick={() => setMostraForm(!mostraForm)}

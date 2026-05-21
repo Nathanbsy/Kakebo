@@ -1,4 +1,5 @@
 import { useState } from "react";
+import api from "../services/api";
 
 export default function MovimentacaoForm() {
   const [formData, setFormData] = useState({
@@ -10,18 +11,25 @@ export default function MovimentacaoForm() {
   });
 
   //depois subistituir essa bomba por aquela coisinha do bao
-  const escrever = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+  const escrever = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ 
+      ...formData, 
+      [e.target.name]: e.target.value 
+    });
+  }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission
+  const handleSubmit = (evento: React.FormEvent) => {
+    evento.preventDefault();
+    console.log(formData);
+    api.post("/movimentacao", formData)
+      .then((resposta) => {
+        console.log(resposta.data);
+        alert("Movimentação adicionada com sucesso!");
+      })
+      .catch((erro) => {
+        console.error(erro);
+        alert("Erro ao adicionar movimentação.");
+      });
   };
 
   return (

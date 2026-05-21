@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 export default function RelatoriosPage() {
-  const [relatorioTipo, setRelatorioTipo] = useState("monthly");
+  const [relatorioTipo, setRelatorioTipo] = useState("mensal");
 
   return (
     <div className="space-y-6">
