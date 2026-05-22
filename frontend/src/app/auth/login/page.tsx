@@ -8,7 +8,6 @@ import { useAuth } from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [user, setUser] = useState({
     email: "",
     password: "",
@@ -23,7 +22,7 @@ export default function LoginPage() {
   }
 
   if (isUserLoggedIn()) {
-    router.push("/");
+    window.location.href = "/";
   }
   
   const handleSubmit = async (evento: React.FormEvent) => {
@@ -32,7 +31,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await login(user.email, user.password);
-      router.push("/");
+      window.location.href = "/";
     } catch (err) {
       setError("Falha ao realizar o login");
     } finally {

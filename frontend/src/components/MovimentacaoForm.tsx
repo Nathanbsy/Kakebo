@@ -7,14 +7,13 @@ export default function MovimentacaoForm() {
     descricao: "",
     data: "",
     categoria: "",
-    tipo: "despesa",
+    tipo: "Despesa",
   });
 
-  //depois subistituir essa bomba por aquela coisinha do bao
-  const escrever = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const escrever = (evento: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ 
       ...formData, 
-      [e.target.name]: e.target.value 
+      [evento.target.name]: evento.target.value 
     });
   }
 
@@ -81,6 +80,19 @@ export default function MovimentacaoForm() {
           required
         >
           <option>Selecione uma categoria</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700">Tipo</label>
+        <select
+          name="tipo"
+          value={formData.tipo}
+          onChange={escrever}
+          className="mt-1 block w-full rounded-md border-gray-300"
+          required
+        >
+          <option value="Despesa">Despesa</option>
+          <option value="Receita">Receita</option>
         </select>
       </div>
       <button

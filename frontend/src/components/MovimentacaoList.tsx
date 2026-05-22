@@ -1,4 +1,4 @@
-import { Movimentacao } from "@prisma/client";
+import { Movimentacao } from "@/types/index";
 
 interface Props {
   movimentacoes: Movimentacao[];

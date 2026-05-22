@@ -13,10 +13,10 @@ export default function Sidebar() {
           </li>
           <li>
             <a
-              href="/transactions"
+              href="/movimentacoes"
               className="block px-4 py-2 rounded hover:bg-blue-700"
             >
-              Transações
+              Movimentações
             </a>
           </li>
           <li>

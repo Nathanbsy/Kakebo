@@ -21,7 +21,6 @@ export default function Card({ pagina, titulo, corBg, corBgLight, corShadow, ico
                 </div>
                 <p>{titulo}</p>
             </div>
-
         </Link>
     );
 }

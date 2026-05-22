@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
+import { ArrowLeft } from "lucide-react";
+import Back from "../components/Back";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -23,17 +25,6 @@ export default function RootLayout({
       lang="pt-br"
       className={`${nunito.variable} h-full antialiased`}
     >
-      {/* <html lang="pt-br">
-      <body>
-        <div className="flex h-screen bg-gray-100">
-          <Sidebar />
-          <div className="flex-1 flex flex-col">
-            <Header />
-            <main className="flex-1 overflow-auto p-6">{children}</main>
-          </div>
-        </div>
-      </body>
-    </html> */}
       <body className="min-h-full flex flex-col">
         <div className="flex h-screen">
           {/* <Sidebar /> */}
@@ -42,6 +33,7 @@ export default function RootLayout({
             <main className="flex-1 overflow-auto p-6">{children}</main>
           </div>
         </div>
+        <Back />
       </body>
     </html>
   );

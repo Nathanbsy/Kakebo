@@ -1,12 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Categoria } from "../../types";
+import api from "../services/api";
 
-interface Props {
-  categorias: Categoria[];
-}
-
-export default function CategoriaManager({ categorias }: Props) {
+export default function CategoriaManager() {
   const [showForm, setShowForm] = useState(false);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [formData, setFormData] = useState({
+    nome: "",
+    icon: "",
+  });
+
+  const escrever = (evento: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ 
+      ...formData, 
+      [evento.target.name]: evento.target.value 
+    });
+  }
+
+  const handleSubmit = (evento: React.FormEvent) => {
+    evento.preventDefault();
+
+  };
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      const categorias = await api.get("/categoria");
+      setCategorias(categorias.data);
+    };
+    fetchCategorias();
+  }, []);
+
 
   return (
     <div>
@@ -21,12 +44,32 @@ export default function CategoriaManager({ categorias }: Props) {
       </div>
 
       {showForm && (
-        <form className="mb-4 p-4 bg-gray-50 rounded-md">
+        <form className="mb-4 p-4 bg-gray-50 rounded-md" onSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="Nome da categoria"
             className="w-full mb-2 p-2 border rounded"
+            value={formData.nome}
+            name="nome"
+            onChange={escrever}
           />
+          <input
+            type="text"
+            placeholder="Ícone da categoria"
+            className="w-full mb-2 p-2 border rounded"
+            value={formData.icon}
+            name="icon"
+            onChange={escrever}
+          />
+          <input
+            type="color"
+            className="w-full mb-2 p-2 border rounded"
+            value={formData.icon}
+            name="color"
+            onChange={escrever}
+          >
+          
+          </input>
           <button
             type="submit"
             className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"

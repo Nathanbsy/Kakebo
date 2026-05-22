@@ -7,21 +7,10 @@ import Card from "@/src/components/Card";
 export default function HomePage() {
   return (
     <div className="w-full h-full flex flex-col items-center space-y-6 p-6 ">
-      {/* <div className='flex items-center justify-center'>
-        <div className='flex flex-col items-center justify-center'>
-          <h1 className="text-4xl font-bold text-gray-900">
-            Bem-vindo ao Kakeibo!
-          </h1>
-          <p className="mt-4 text-center text-gray-600">
-            Gerencie suas finanças pessoais de forma simples e eficiente.
-          </p>
-      </div>
-      </div> */}
-      
       <div className="w-full h-full flex flex-col justify-center items-center gap-16">
         <div className='flex flex-col items-center justify-center'>
           <h1 className="text-4xl font-bold text-gray-900">
-            Bem-vindo ao <span className="text-blue-500">Kakeibo</span>!
+            Bem-vindo ao <span className="text-blue-500">Kakebo</span>!
           </h1>
           <p className="mt-4 text-center text-gray-600">
             Gerencie suas finanças pessoais de forma simples e eficiente.

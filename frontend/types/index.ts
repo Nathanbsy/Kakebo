@@ -4,7 +4,7 @@ export interface User {
   nome?: string;
   rendaMensal: number;
   metaEconomiaMensal: number;
-  dataCriacao: string;
+  dataCriacao: Date;
 }
 
 export interface Categoria {
@@ -21,10 +21,10 @@ export interface Movimentacao {
   categoriaId: string;
   quantia: number;
   descricao?: string;
-  data: string;
+  data: Date;
   tipo: "receita" | "despesa";
   metodo: "dinheiro" | "cartão" | "transferência bancária" | "pix";
-  dataCriacao: string;
+  dataCriacao: Date;
 }
 export interface Relatorio {
   id: string;
@@ -33,14 +33,14 @@ export interface Relatorio {
   tipoRelatorio: string;
   frequencia: "diária" | "semanal" | "mensal";
   ativo: boolean;
-  dataCriacao: string;
+  dataCriacao: Date;
 }
 
 export interface HistoricoReflexao {
   id: string;
   userId: string;
   comentario: string;
-  dataCriacao: string;
+  dataCriacao: Date;
 }
 
 export interface AuthResponse {

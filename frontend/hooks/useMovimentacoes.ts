@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { Movimentacao } from "@/types";
+import api from "../src/services/api";
 
 export function useMovimentacoes() {
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
@@ -9,8 +10,8 @@ export function useMovimentacoes() {
   const fetchMovimentacoes = useCallback(async () => {
     try {
       setLoading(true);
-      // const response = await api.get("/movimentacoes");
-      // setMovimentacoes(response.data);
+      const response = await api.get("/movimentacoes");
+      setMovimentacoes(response.data);
       setError(null);
     } catch (err) {
       setError("Failed to fetch movimentacoes");
@@ -22,8 +23,8 @@ export function useMovimentacoes() {
   const createMovimentacao = useCallback(async (data: Partial<Movimentacao>) => {
     try {
       setLoading(true);
-      // const response = await api.post("/movimentacoes", data);
-      // setMovimentacoes([...movimentacoes, response.data]);
+      const response = await api.post("/movimentacoes", data);
+      setMovimentacoes([...movimentacoes, response.data]);
       setError(null);
     } catch (err) {
       setError("Failed to create movimentacao");
@@ -35,8 +36,8 @@ export function useMovimentacoes() {
   const deleteMovimentacao = useCallback(async (id: string) => {
     try {
       setLoading(true);
-      // await api.delete(`/movimentacoes/${id}`);
-      // setMovimentacoes(movimentacoes.filter(m => m.id !== id));
+      const response = await api.delete(`/movimentacoes/${id}`);
+      setMovimentacoes(movimentacoes.filter(m => m.id !== id));
       setError(null);
     } catch (err) {
       setError("Failed to delete movimentacao");

@@ -21,6 +21,9 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
 }
+main {
+  padding: 3.5rem;
+}
 
 /*
 @theme inline {
@@ -36,4 +39,4 @@ body {
     --foreground: #ededed;
   }
 }
-  */
+*/
