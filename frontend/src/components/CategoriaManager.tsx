@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Categoria } from "../../types";
 import api from "../services/api";
 
-export default function CategoriaManager() {
+export default function CategoriaManager({ categorias }: { categorias: Categoria[] }) {
   const [showForm, setShowForm] = useState(false);
-  const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [formData, setFormData] = useState({
     nome: "",
     icon: "",
@@ -19,16 +18,17 @@ export default function CategoriaManager() {
 
   const handleSubmit = (evento: React.FormEvent) => {
     evento.preventDefault();
-
+    console.log(formData);
+    api.post("/categorias", formData)
+      .then((resposta) => {
+        console.log(resposta.data);
+        alert("Categoria adicionada com sucesso!");
+      })
+      .catch((erro) => {
+        console.error(erro);
+        alert("Erro ao adicionar categoria.");
+      });
   };
-
-  useEffect(() => {
-    const fetchCategorias = async () => {
-      const categorias = await api.get("/categoria");
-      setCategorias(categorias.data);
-    };
-    fetchCategorias();
-  }, []);
 
 
   return (
@@ -52,6 +52,7 @@ export default function CategoriaManager() {
             value={formData.nome}
             name="nome"
             onChange={escrever}
+            required
           />
           <input
             type="text"

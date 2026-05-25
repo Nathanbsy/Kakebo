@@ -3,6 +3,7 @@ import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ArrowLeft } from "lucide-react";
 import Back from "../components/Back";
+import Logout from "../components/Logout";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({
       className={`${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <Back />
         <div className="flex h-screen">
           {/* <Sidebar /> */}
           <div className="flex-1 flex flex-col">
@@ -33,7 +35,7 @@ export default function RootLayout({
             <main className="flex-1 overflow-auto p-6">{children}</main>
           </div>
         </div>
-        <Back />
+        <Logout />
       </body>
     </html>
   );

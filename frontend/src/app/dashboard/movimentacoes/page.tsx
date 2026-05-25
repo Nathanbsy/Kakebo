@@ -4,23 +4,35 @@ import { useEffect, useState } from "react";
 import MovimentacaoForm from "@/src/components/MovimentacaoForm";
 import MovimentacaoList from "@/src/components/MovimentacaoList";
 import api from "@/src/services/api";
-import { Movimentacao } from "@/types";
+import { Categoria, Movimentacao } from "@/types";
 import styles from "@/src/components/css/Movimentacoes.module.css";
 
 export default function MovimentacoesPage() {
   const [mostraForm, setMostraForm] = useState(false);
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [mensagemRetorno, setMensagemRetorno] = useState<string>("");
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
   
   useEffect(() => {
-    api.get("/movimentacao")
+    api.get("/movimentacoes")
       .then((resposta) => {
         if(!resposta || !resposta.data) {
           setMovimentacoes([]);
           setMensagemRetorno("Nenhuma movimentação encontrada.");
           return;
         }
-        setMovimentacoes(resposta.data);
+        setMovimentacoes(resposta.data.data);
+      })
+      .catch((erro) => {
+        console.error(erro);
+      });
+    api.get("/categorias")
+      .then((resposta) => {
+        if (!resposta || !resposta.data) {
+          setCategorias([]);
+          return;
+        }
+        setCategorias(resposta.data.data);
       })
       .catch((erro) => {
         console.error(erro);
@@ -41,7 +53,7 @@ export default function MovimentacoesPage() {
 
       {mostraForm && (
         <div className="bg-white p-6 rounded-lg shadow">
-          <MovimentacaoForm />
+          <MovimentacaoForm categorias={categorias} />
         </div>
       )}
       <div>

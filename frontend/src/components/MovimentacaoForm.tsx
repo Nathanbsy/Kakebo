@@ -1,34 +1,38 @@
 import { useState } from "react";
 import api from "../services/api";
+import { Categoria } from "@/types";
 
-export default function MovimentacaoForm() {
+export default function MovimentacaoForm({ categorias }: { categorias: Categoria[] }) {
   const [formData, setFormData] = useState({
     quantia: "",
     descricao: "",
     data: "",
-    categoria: "",
+    categoriaId: 0,
     tipo: "Despesa",
+    metodo: "",
   });
 
   const escrever = (evento: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({ 
+    setFormData({
       ...formData, 
       [evento.target.name]: evento.target.value 
     });
   }
 
-  const handleSubmit = (evento: React.FormEvent) => {
+  const handleSubmit = async (evento: React.FormEvent) => {
     evento.preventDefault();
     console.log(formData);
-    api.post("/movimentacao", formData)
+    try {
+      await api.post("/movimentacoes", formData)
       .then((resposta) => {
-        console.log(resposta.data);
+        console.log(resposta);
         alert("Movimentação adicionada com sucesso!");
-      })
-      .catch((erro) => {
-        console.error(erro);
-        alert("Erro ao adicionar movimentação.");
       });
+    } catch (erro) {
+      console.error(erro);
+      alert("Erro ao adicionar movimentação.");
+    }
+    
   };
 
   return (
@@ -73,13 +77,18 @@ export default function MovimentacaoForm() {
           Categoria
         </label>
         <select
-          name="categoria"
-          value={formData.categoria}
+          name="categoriaId"
+          value={formData.categoriaId}
           onChange={escrever}
           className="mt-1 block w-full rounded-md border-gray-300"
           required
         >
           <option>Selecione uma categoria</option>
+          {categorias.map((categoria) => (
+            <option key={categoria.id} value={categoria.id}>
+              {categoria.nome}
+            </option>
+          ))}
         </select>
       </div>
       <div>
@@ -94,7 +103,29 @@ export default function MovimentacaoForm() {
           <option value="Despesa">Despesa</option>
           <option value="Receita">Receita</option>
         </select>
+        
       </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          Método
+        </label>
+        <select
+          name="metodo"
+          value={formData.metodo}
+          onChange={escrever}
+          className="mt-1 block w-full rounded-md border-gray-300"
+          required
+        >
+          <option>Selecione um método</option>
+          <option value="Dinheiro">Dinheiro</option>
+          <option value="Pix">Pix</option>
+          <option value="Cartão de Crédito">Cartão de Crédito</option>
+          <option value="Cartão de Débito">Cartão de Débito</option>
+          <option value="Transferência Bancária">Transferência</option>
+        </select>
+      </div>
+
       <button
         type="submit"
         className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"

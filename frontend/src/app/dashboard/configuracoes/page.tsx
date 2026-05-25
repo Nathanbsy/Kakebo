@@ -15,6 +15,7 @@ export default function ConfiguracoesPage() {
   async function pegarDadosUsuario() {
     try {
       const res = await api.get("/me");
+      console.log("Resposta da API /me:", res);
       if (res.data.success) {
         const userData = res.data.user;
         setUser({

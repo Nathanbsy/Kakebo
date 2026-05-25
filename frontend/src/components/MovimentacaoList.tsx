@@ -32,11 +32,11 @@ export default function MovimentacaoList({ movimentacoes }: Props) {
           {movimentacoes.map((movimentacao) => (
             <tr key={movimentacao.id}>
               <td className="px-6 py-4 whitespace-nowrap">
-                {movimentacao.data.toLocaleDateString()}
+                {new Date(movimentacao.data).toLocaleDateString("pt-BR")}
               </td>
               <td className="px-6 py-4">{movimentacao.descricao}</td>
-              <td className="px-6 py-4">{movimentacao.categoriaId}</td>
-              <td className="px-6 py-4">{`R$ ${movimentacao.quantia.toFixed(2)}`}</td>
+              <td className="px-6 py-4">{movimentacao.categoria?.nome || "Categoria não encontrada" }</td>
+              <td className="px-6 py-4">{`R$ ${Number(movimentacao.quantia).toFixed(2).replace('.', ',')}`}</td>
               <td className="px-6 py-4">{movimentacao.tipo}</td>
             </tr>
           ))}
