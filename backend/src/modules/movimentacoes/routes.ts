@@ -10,12 +10,25 @@ const router = Router();
 // Validation schema
 const movimentacaoSchema = z.object({
   categoriaId: z.string(),
-  quantia: z.number().positive("A quantia deve ser positiva"),
+
+  quantia: z.coerce
+    .number()
+    .positive("A quantia deve ser positiva"),
+
   descricao: z.string().optional(),
-  data: z.string(),
-  tipo: z.enum(["receita", "despesa"]),
-  metodo: z.enum(["dinheiro", "cartão", "transferência bancária", "pix"]).optional(),
+
+  data: z.coerce.date(),
+
+  tipo: z.enum(["Receita", "Despesa"]),
+
+  metodo: z.enum([
+    "dinheiro",
+    "cartão",
+    "transferência bancária",
+    "pix"
+  ]).optional(),
 });
+
 
 // GET /api/movimentacoes
 router.get("/", authMiddleware, async (req: Request, res: Response) => {
@@ -72,7 +85,6 @@ router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
 // POST /api/movimentacoes
 router.post("/", authMiddleware, async (req: Request, res: Response) => {
   try {
-    
     const userId = req.user?.id;
     const data = movimentacaoSchema.parse(req.body);
 
@@ -90,7 +102,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
         ...data,
         userId: userId!,
         data: new Date(data.data),
-        quantia: BigInt(Math.round(data.quantia * 100)) as any, 
+        quantia: data.quantia, 
       },
       include: { categoria: true },
     });
