@@ -57,4 +57,5 @@ const PORT = config.api.port;
 app.listen(PORT, () => {
   console.log(`API rodando na porta: ${PORT}`);
 });
+
 export default app;

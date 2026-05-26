@@ -2,7 +2,6 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { authMiddleware } from "../../shared/utils/middleware";
-import { MovimentacaoData } from "../../shared/types";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -22,10 +21,11 @@ const movimentacaoSchema = z.object({
   tipo: z.enum(["Receita", "Despesa"]),
 
   metodo: z.enum([
-    "dinheiro",
-    "cartão",
-    "transferência bancária",
-    "pix"
+    "Dinheiro",
+    "Pix",
+    "Cartão de Crédito",
+    "Cartão de Débito",
+    "Transferência Bancária"
   ]).optional(),
 });
 
@@ -61,7 +61,61 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
   }
 });
 
-// GET /api/movimentacoes/:id
+// Rotas específicas devem vir ANTES de rotas genéricas como /:id
+router.get("/gasto-mensal", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    console.log("Endpoint /movimentacoes/gasto-mensal acessado");
+    const userId = req.user?.id;
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const gastoMensal = await prisma.movimentacao.findMany({
+      where: {
+        userId,
+        data: {
+          gte: firstDayOfMonth,
+          lte: lastDayOfMonth,
+        },
+        tipo: "Despesa",
+      },
+      include: { categoria: true },
+    });
+
+    return res.json({ success: true, data: gastoMensal });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+router.get("/receita-mensal", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const now = new Date();
+    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+    const receitaMensal = await prisma.movimentacao.aggregate({
+      where: {
+        userId,
+        data: {
+          gte: firstDayOfMonth,
+          lte: lastDayOfMonth,
+        },
+        tipo: "Receita",
+      },
+      _sum: {
+        quantia: true,
+      },
+    });
+
+    return res.json({ success: true, data: receitaMensal });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+// GET /api/movimentacoes/:id - rota genérica deve ser a última
 router.get("/:id", authMiddleware, async (req: Request, res: Response) => {
   try {
     const { id } = req.params as { id: string };
