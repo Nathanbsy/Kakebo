@@ -14,29 +14,33 @@ export default function MovimentacoesPage() {
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   
   useEffect(() => {
-    api.get("/movimentacoes")
-      .then((resposta) => {
-        if(!resposta || !resposta.data) {
-          setMovimentacoes([]);
-          setMensagemRetorno("Nenhuma movimentação encontrada.");
-          return;
-        }
-        setMovimentacoes(resposta.data.data);
-      })
-      .catch((erro) => {
-        console.error(erro);
-      });
-    api.get("/categorias")
-      .then((resposta) => {
-        if (!resposta || !resposta.data) {
-          setCategorias([]);
-          return;
-        }
-        setCategorias(resposta.data.data);
-      })
-      .catch((erro) => {
-        console.error(erro);
-      });
+    const fetchData = async () => {
+      try {
+        await api.get("/movimentacoes")
+        .then((resposta) => {
+          if(!resposta || !resposta.data) {
+            setMovimentacoes([]);
+            setMensagemRetorno("Nenhuma movimentação encontrada.");
+            return;
+          }
+          setMovimentacoes(resposta.data.data);
+        })
+        .catch((erro) => {
+          console.error(erro);
+        });
+        await api.get("/categorias")
+        .then((resposta) => {
+          if (!resposta || !resposta.data) {
+            setCategorias([]);
+            return;
+          }
+          setCategorias(resposta.data.data);
+        });
+      } catch (error) {
+        console.error("Erro ao buscar dados do dashboard:", error);
+      }
+    }
+    fetchData();
   }, []);
 
   return (

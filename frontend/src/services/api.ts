@@ -60,35 +60,36 @@ api.interceptors.response.use(
   }
 });
 
-api.interceptors.request.use((config) => {
+// apagar depois
+// api.interceptors.request.use((config) => {
 
-  console.log("========== REQUEST ==========");
-  console.log("URL:", config.url);
-  console.log("METHOD:", config.method);
-  console.log("HEADERS:", config.headers);
-  console.log("DATA:", config.data);
-  console.log("WITH CREDENTIALS:", config.withCredentials);
+//   console.log("========== REQUEST ==========");
+//   console.log("URL:", config.url);
+//   console.log("METHOD:", config.method);
+//   console.log("HEADERS:", config.headers);
+//   console.log("DATA:", config.data);
+//   console.log("WITH CREDENTIALS:", config.withCredentials);
 
-  return config;
-});
+//   return config;
+// });
 
-api.interceptors.response.use(
-  (response) => {
-    console.log("========== RESPONSE ==========");
-    console.log("URL:", response);
+// api.interceptors.response.use(
+//   (response) => {
+//     console.log("========== RESPONSE ==========");
+//     console.log("URL:", response);
 
-    return response;
-  },
+//     return response;
+//   },
 
-  (error) => {
+//   (error) => {
 
-    console.log("========== ERROR ==========");
-    console.log("URL:", error.config?.url);
-    console.log("STATUS:", error.response?.status);
-    console.log("DATA:", error.response?.data);
+//     console.log("========== ERROR ==========");
+//     console.log("URL:", error.config?.url);
+//     console.log("STATUS:", error.response?.status);
+//     console.log("DATA:", error.response?.data);
 
-    return Promise.reject(error);
-  }
-);
+//     return Promise.reject(error);
+//   }
+// );
 
 export default api;

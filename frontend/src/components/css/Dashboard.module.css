@@ -1,0 +1,29 @@
+.dashboard-container {
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 25px;
+}
+
+.dashboard-card {
+  background-color: white;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.112);
+  flex: 1;
+  min-width: 170px;
+  max-width: 400px;
+  border: 0.5px solid #e5e7eb;
+  transition: all 0.5s ease-in-out;
+}
+
+.dashboard-card p {
+  cursor: default;
+}
+
+.dashboard-card:hover {
+    border: 0.5px solid rgba(41, 152, 243, 0.685);
+    box-shadow: 0 4px 8px rgba(41, 152, 243, 0.413);
+    transition: all 0.5s ease-in-out;
+}
