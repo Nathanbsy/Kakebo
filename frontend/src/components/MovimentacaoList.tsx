@@ -1,4 +1,5 @@
 import { Movimentacao } from "@/types/index";
+import styles from "./css/Table.module.css";
 
 interface Props {
   movimentacoes: Movimentacao[];
@@ -8,36 +9,36 @@ export default function MovimentacaoList({ movimentacoes }: Props) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className={styles.table}>
+        <thead className={styles.thead}>
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className={styles.th}>
               Data
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className={styles.th}>
               Descrição
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className={styles.th}>
               Categoria
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className={styles.th}>
               Valor
             </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+            <th className={styles.th}>
               Tipo
             </th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className={styles.tbody}>
           {movimentacoes.map((movimentacao) => (
             <tr key={movimentacao.id}>
-              <td className="px-6 py-4 whitespace-nowrap">
+              <td className={styles.td}>
                 {new Date(movimentacao.data).toLocaleDateString("pt-BR")}
               </td>
-              <td className="px-6 py-4">{movimentacao.descricao}</td>
-              <td className="px-6 py-4">{movimentacao.categoria?.nome || "Categoria não encontrada" }</td>
-              <td className="px-6 py-4">{`R$ ${Number(movimentacao.quantia).toFixed(2).replace('.', ',')}`}</td>
-              <td className="px-6 py-4">{movimentacao.tipo}</td>
+              <td className={styles.td}>{movimentacao.descricao}</td>
+              <td className={styles.td}>{movimentacao.categoria?.nome || "Categoria não encontrada" }</td>
+              <td className={styles.td}>{`R$ ${Number(movimentacao.quantia).toFixed(2).replace('.', ',')}`}</td>
+              <td className={styles.td}>{movimentacao.tipo}</td>
             </tr>
           ))}
         </tbody>

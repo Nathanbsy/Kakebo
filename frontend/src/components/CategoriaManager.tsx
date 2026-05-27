@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Categoria } from "../../types";
 import api from "../services/api";
+import styles from "./css/CategoriaManager.module.css";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function CategoriaManager({ categorias }: { categorias: Categoria[] }) {
   const [showForm, setShowForm] = useState(false);
@@ -33,11 +35,13 @@ export default function CategoriaManager({ categorias }: { categorias: Categoria
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Categorias</h2>
+      <div className={styles["categorias-header"]}>
+        <h2 className="text-xl font-bold">Categorias</h2>
+
+        {/* depois alterar estilo do botao */}
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+          className=""
         >
           Nova Categoria
         </button>
@@ -80,17 +84,41 @@ export default function CategoriaManager({ categorias }: { categorias: Categoria
         </form>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className={styles["categorias-list"]}>
+        {/* depois adicionar a cor do card dependendo da cor no banco de dados */}
         {categorias.map((categoria) => (
           <div
             key={categoria.id}
-            className="p-4 border rounded-lg bg-white shadow-sm"
+            className={styles["categoria-item"]}
           >
-            <h3 className="font-semibold">{categoria.nome}</h3>
-            <p className="text-sm text-gray-600">
-              {/* depois adicionar a exibicao do icon */}
-              {categoria.icon}
-            </p>
+            <div className={styles["categoria-info"]}>
+              <h3 className="font-semibold">{categoria.nome}</h3>
+              <p className="text-sm text-gray-600">
+                {/* depois adicionar a exibicao do icon */}
+                {categoria.icon}
+              </p>
+            </div>
+            <div className={styles["categoria-actions"]}>
+              {/* BOTAO EXCLUIR */}
+              <form>
+                <button 
+                  type="submit"
+                  className="text-red-600 cursor-pointer transition-all hover:text-red-800"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </form>
+              <form>
+                {/* BOTAO EDITAR */}
+                <button 
+                  type="submit"
+                  className="text-blue-500 cursor-pointer transition-all hover:text-blue-700"
+                  >
+                  <Pencil size={20} />
+                </button>
+              </form>
+            </div>
+            
           </div>
         ))}
       </div>
