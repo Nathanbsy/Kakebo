@@ -10,13 +10,6 @@
   --text-color: #F5F7FA;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  list-style-type: none;
-}
-
 body {
   background-color: var(--bg-color);
   color: var(--text-color);

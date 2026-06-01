@@ -20,7 +20,7 @@ export default function RelatoriosPage() {
             <option value="anual">Anual</option>
             <option value="semanal">Semanal</option>
           </select>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+          <button className="bg-purple-700 text-white px-4 py-2 rounded-md cursor-pointer hover:bg-purple-800 transition-all duration-200">
             Exportar
           </button>
         </div>

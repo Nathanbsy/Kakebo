@@ -1,3 +1,37 @@
+.formAuth {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  height: fit-content;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.112);
+  padding: 2rem;
+  margin: 1.30rem auto;
+  border-radius: 8px;
+}
+
+.formAuth h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.formAuth button {
+  background-color: #0F766E;
+  color: white;
+  padding: 0.5rem 1.5rem;
+  border-radius: 16px;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  margin-top: 1.75rem;
+}
+
+.formAuth button:hover {
+  background-color: #22a392;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(13, 110, 104, 0.3);
+}
+
 .input-container {
   position: relative;
   margin: 1.8rem auto;

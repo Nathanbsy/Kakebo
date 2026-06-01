@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import api from "../../../services/api";
-import styles from "../../../components/css/auth.module.css";
+import styles from "../../../components/css/Form.module.css";
 import Cookies from "js-cookie";
 
 export default function RegisterPage() {

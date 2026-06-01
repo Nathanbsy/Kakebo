@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import api from "../../../services/api";
-
+import styles from "../../../components/css/Form.module.css";
 
 export default function ConfiguracoesPage() {
 
@@ -66,17 +66,14 @@ export default function ConfiguracoesPage() {
 
   return (
     <div className="space-y-6">
-      {/* <div onLoad={pegarDadosUsuario}></div> */}
       <h1 className="text-3xl font-bold text-gray-900">Configurações</h1>
 
-      <div className="bg-white p-6 rounded-lg shadow space-y-6">
-        <section>
+      <div className={styles.formAuth}>
+        <section >
           <h2 className="text-xl font-semibold mb-4">Perfil</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Nome
-              </label>
+            <div className={styles["input-container"]}>
+              
               <input
                 type="text"
                 name="nome"
@@ -84,11 +81,11 @@ export default function ConfiguracoesPage() {
                 value={user.nome}
                 onChange={escrever}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Email
+              <label className={styles.label}>
+                Nome
               </label>
+            </div>
+            <div className={styles["input-container"]}>
               <input
                 type="email"
                 name="email"
@@ -96,11 +93,11 @@ export default function ConfiguracoesPage() {
                 value={user.email}
                 onChange={escrever}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Renda Mensal
+              <label className={styles.label}>
+                Email
               </label>
+            </div>
+            <div className={styles["input-container"]}>
               <input
                 type="text"
                 name="rendaMensal"
@@ -108,11 +105,11 @@ export default function ConfiguracoesPage() {
                 value={user.rendaMensal}
                 onChange={escrever}
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700">
-                Meta de Economia Mensal
+              <label className={styles.label}>
+                Renda Mensal
               </label>
+            </div>
+            <div className={styles["input-container"]}>
               <input
                 type="number"
                 name="metaEconomiaMensal"
@@ -120,18 +117,22 @@ export default function ConfiguracoesPage() {
                 value={user.metaEconomiaMensal}
                 onChange={escrever}
               />
+              <label className={styles.label}>
+                Meta de Economia Mensal
+              </label>
             </div>
-            <button
+            <div className="text-center">
+              <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-            >
+              >
               Salvar
             </button>
+            </div>
           </form>
         </section>
 
-        <section className="border-t pt-6">
-          <h2 className="text-xl font-semibold mb-4">Integrações</h2>
+        <section className="pt-6">
+          <h2 className="text-xl text-center font-semibold mb-4">Integrações</h2>
           <div className="space-y-2">
             <button className="block w-full text-left p-4 border rounded-md hover:bg-gray-50">
               Conectar Google Sheets

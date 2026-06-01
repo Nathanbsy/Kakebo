@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import styles from "../../../components/css/auth.module.css";
+import styles from "../../../components/css/Form.module.css";
 import { useAuth } from "../../../../hooks/useAuth";
 import Cookies from "js-cookie";
 
@@ -48,15 +48,16 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Entrar no Kakeibo
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
+        <form className="flex flex-col items-center justify-center gap-4 space-y-4" onSubmit={handleSubmit}>
+          <div className={styles.formAuth}>
+            <h2 className="text-xl font-semibold mb-4">Login</h2>
             <div className={styles["input-container"]}>
               
               <input
@@ -85,12 +86,10 @@ export default function LoginPage() {
               <label htmlFor="password" className={styles.label}>Senha</label>
               <div className={styles.underline}></div>
             </div>
-            
-          </div>
-          <button
+            <button
             type="submit"
             disabled={loading}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+            className={styles["login-button"]}
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>
@@ -99,6 +98,8 @@ export default function LoginPage() {
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
+          </div>
+          
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Não tem conta?{" "}
