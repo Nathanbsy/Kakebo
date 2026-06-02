@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
 import "./globals.css";
-import { ArrowLeft } from "lucide-react";
 import Back from "../components/Back";
 import Logout from "../components/Logout";
 

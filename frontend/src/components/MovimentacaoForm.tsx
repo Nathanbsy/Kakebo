@@ -14,9 +14,12 @@ export default function MovimentacaoForm({ categorias }: { categorias: Categoria
 
   const escrever = (evento: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
+      
       ...formData, 
-      [evento.target.name]: evento.target.value 
+      [evento.target.name]: evento.target.value,
+      
     });
+    
   }
 
   const handleSubmit = async (evento: React.FormEvent) => {

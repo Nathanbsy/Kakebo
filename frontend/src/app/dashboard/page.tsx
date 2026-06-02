@@ -2,7 +2,6 @@
 
 import MensalSpending from "@/src/components/Charts/MensalSpending";
 import CategoriaBreakdown from "@/src/components/Charts/CategoriaBreakdown";
-import TrendAnalysis from "@/src/components/Charts/TrendAnalysis";
 import { useEffect, useState } from "react";
 import { Movimentacao, User } from "@/types";
 import api from "@/src/services/api";
@@ -12,11 +11,9 @@ export default function DashboardPage() {
   const [ movimentacoes, setMovimentacoes ] = useState<Movimentacao[]>([]);
   const [ user, setUser ] = useState<User | null>(null);
 
-  var totalGastoMes: number = movimentacoes.reduce((acc, curr) => acc + curr.quantia, 0);
+  var totalGastoMes: number = Number(movimentacoes.reduce((sum: number, mov: Movimentacao) => sum + Number(mov.quantia), 0));
 
-  var totalTransacoes: number = movimentacoes.length;
-
-  var orcamentoDisponivel: number = Number(user?.rendaMensal) - totalGastoMes ? Number(user?.rendaMensal) - totalGastoMes : 0;
+  var totalTransacoes: number = Number(movimentacoes.length);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +80,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MensalSpending />
+        <MensalSpending movimentacoes={movimentacoes} />
         <CategoriaBreakdown />
       </div>
 
