@@ -62,13 +62,23 @@ router.get("/", authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Rotas específicas devem vir ANTES de rotas genéricas como /:id
+// GET /api/movimentacoes/gasto-mensal?ano=2026&mes=5 (mes é 1-indexed: 1=janeiro, 12=dezembro)
 router.get("/gasto-mensal", authMiddleware, async (req: Request, res: Response) => {
   try {
     console.log("Endpoint /movimentacoes/gasto-mensal acessado");
     const userId = req.user?.id;
+    console.log("userId:", userId);
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "UserId não encontrado no token" });
+    }
+    
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    let mes = now.getMonth() + 1;
+    let ano = now.getFullYear();
+    
+    const firstDayOfMonth = new Date(ano, mes - 1, 1);
+    const lastDayOfMonth = new Date(ano, mes, 0);
 
     const gastoMensal = await prisma.movimentacao.findMany({
       where: {
@@ -79,10 +89,15 @@ router.get("/gasto-mensal", authMiddleware, async (req: Request, res: Response) 
         },
         tipo: "Despesa",
       },
-      include: { categoria: true },
+      include: {
+        categoria: true,
+      },
+      orderBy: { data: "desc" },
     });
-
-    return res.json({ success: true, data: gastoMensal });
+    
+    console.log(`Gasto mensal encontrado: ${gastoMensal.length} itens`);
+    
+    return res.json({ success: true, data: gastoMensal, periodo: { mes, ano } });
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
@@ -191,7 +206,7 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
       data: {
         ...data,
         data: data.data ? new Date(data.data) : undefined,
-        quantia: data.quantia ? (BigInt(Math.round(data.quantia * 100)) as any) : undefined,
+        quantia: data.quantia ? data.quantia : undefined,
       },
       include: { categoria: true },
     });
