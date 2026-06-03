@@ -33,10 +33,10 @@ export default function MovimentacaoList({ movimentacoes }: Props) {
           {movimentacoes.map((movimentacao) => (
             <tr key={movimentacao.id}>
               <td className={styles.td}>
-                {new Date(movimentacao.data).toLocaleDateString("pt-BR")}
+                {new Date(movimentacao.data).toISOString().split('T')[0].split('-').reverse().join('/')}
               </td>
               <td className={styles.td}>{movimentacao.descricao}</td>
-              <td className={styles.td}>{movimentacao.categoria?.nome || "Categoria não encontrada" }</td>
+              <td className={styles.td}>{movimentacao.categoria.nome}</td>
               <td className={styles.td}>{`R$ ${Number(movimentacao.quantia).toFixed(2).replace('.', ',')}`}</td>
               <td className={styles.td}>{movimentacao.tipo}</td>
             </tr>

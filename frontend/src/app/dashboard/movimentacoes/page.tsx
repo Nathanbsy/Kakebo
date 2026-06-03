@@ -12,6 +12,9 @@ export default function MovimentacoesPage() {
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [mensagemRetorno, setMensagemRetorno] = useState<string>("");
   const [categorias, setCategorias] = useState<Categoria[]>([]);
+
+  const totalGasto: number = Number(movimentacoes.reduce((sum: number, mov: Movimentacao) => sum + (mov.tipo == "Despesa" ? Number(mov.quantia) : 0), 0));
+  const totalGanho: number = Number(movimentacoes.reduce((sum: number, mov: Movimentacao) => sum + (mov.tipo == "Receita" ? Number(mov.quantia) : 0), 0));
   
   useEffect(() => {
     const fetchData = async () => {
@@ -67,6 +70,18 @@ export default function MovimentacoesPage() {
 
         <div className="text-center text-gray-600">
           <p>{mensagemRetorno}</p>
+        </div>
+        <div className="flex justify-between mt-4">
+          <div>
+             <p>Total gasto: R$ {totalGasto.toFixed(2).replace('.', ',')}</p>
+              <p>Total ganho: R$ {totalGanho.toFixed(2).replace('.', ',')}</p>
+          </div>
+          <button
+            onClick={() => (console.log(movimentacoes))}
+            className={styles.btn}
+          >
+            Importar OFX
+          </button>
         </div>
       </div>
     </div>

@@ -1,3 +1,7 @@
+:root {
+  --bg-color: #F8F8F8;
+}
+
 .categorias-header {
   display: flex;
   justify-content: space-between;
@@ -30,7 +34,7 @@
 
 .categoria-item {
     display: flex;
-    background-color: #F8F8F8;
+    background-color: var(--bg-color);
     padding: 1rem;
     border-radius: 0.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.112);

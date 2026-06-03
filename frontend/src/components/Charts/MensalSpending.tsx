@@ -5,11 +5,8 @@ import { useEffect, useRef } from 'react';
 export default function MensalSpending({ movimentacoes }: { movimentacoes: Movimentacao[] }) {
   const mensalSpendingChart = useRef<HTMLCanvasElement>(null);  
   const chartRef = useRef<Chart | null>(null);
-  var gastosMensais: number[] = movimentacoes.map(mov => Number(mov.quantia));
-  const mesAnoAtual = new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
   useEffect(() => {
-    console.log("Gastos mensais:", gastosMensais);
     if (!mensalSpendingChart.current) return;
 
     if (chartRef.current) {
@@ -19,7 +16,7 @@ export default function MensalSpending({ movimentacoes }: { movimentacoes: Movim
     chartRef.current = new Chart(mensalSpendingChart.current, {
       type: 'line',
       data: {
-        labels: movimentacoes.map(mov => new Date(mov.data).toLocaleDateString('pt-BR')),
+        labels: movimentacoes.map(mov => new Date(mov.data).toLocaleDateString('pt-BR')).sort(),
         datasets: [
           {
             label: 'Gastos',
@@ -38,7 +35,6 @@ export default function MensalSpending({ movimentacoes }: { movimentacoes: Movim
   return (
     <div className="bg-white p-6 rounded-lg shadow">
       <h3 className="text-lg font-semibold mb-4">Gráfico deste Mês</h3>
-      {/* Chart placeholder - integrate Recharts or Chart.js here */}
       <div>
         <canvas id="mensalSpendingChart" ref={mensalSpendingChart}></canvas>
       </div>

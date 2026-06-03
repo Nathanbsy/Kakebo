@@ -3,12 +3,13 @@
 import MensalSpending from "@/src/components/Charts/MensalSpending";
 import CategoriaBreakdown from "@/src/components/Charts/CategoriaBreakdown";
 import { useEffect, useState } from "react";
-import { Movimentacao, User } from "@/types";
+import { Categoria, Movimentacao, User } from "@/types";
 import api from "@/src/services/api";
 import styles from "@/src/components/css/Dashboard.module.css";
 
 export default function DashboardPage() {
   const [ movimentacoes, setMovimentacoes ] = useState<Movimentacao[]>([]);
+  const [ categorias, setCategorias ] = useState<Categoria[]>([]);
   const [ user, setUser ] = useState<User | null>(null);
 
   var totalGastoMes: number = Number(movimentacoes.reduce((sum: number, mov: Movimentacao) => sum + Number(mov.quantia), 0));
@@ -35,6 +36,15 @@ export default function DashboardPage() {
             return;
           }
           setMovimentacoes(resposta.data.data);
+        });
+        await api.get("/categorias")
+        .then((resposta) => {
+          console.log("Resposta da API /categorias:", resposta);
+          if (!resposta || !resposta.data) {
+            setCategorias([]);
+            return;
+          }
+          setCategorias(resposta.data.data);
         });
       } catch (error) {
         console.error("Erro ao buscar os dados:", error);
@@ -81,11 +91,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <MensalSpending movimentacoes={movimentacoes} />
-        <CategoriaBreakdown />
-      </div>
-
-      <div className="grid grid-cols-1 gap-6">
-        {/* <TrendAnalysis /> */}
+        <CategoriaBreakdown movimentacoes={movimentacoes} categorias={categorias} />
       </div>
     </div>
   );

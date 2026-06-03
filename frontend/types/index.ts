@@ -19,10 +19,11 @@ export interface Movimentacao {
   id: string;
   userId: string;
   categoriaId: string;
+  categoria: Categoria;
   quantia: number;
   descricao?: string;
   data: Date;
-  tipo: "receita" | "despesa";
+  tipo: "Receita" | "Despesa";
   metodo: "dinheiro" | "cartão" | "transferência bancária" | "pix";
   dataCriacao: Date;
 }
