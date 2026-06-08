@@ -7,13 +7,13 @@ interface Props {
   categorias: Categoria[];
 }
 
-export default function CategoriaBreakdown({ movimentacoes, categorias }: Props) {
-  const categoriaBreakdownChart = useRef<HTMLCanvasElement>(null);
+export default function GanhosPorCategoria({ movimentacoes, categorias }: Props) {
+  const categoriaGanhosChart = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<Chart | null>(null);
 
 
   useEffect(() => {
-    if (!categoriaBreakdownChart.current) return;
+    if (!categoriaGanhosChart.current) return;
 
     if (chartRef.current) {
       chartRef.current.destroy();
@@ -37,7 +37,7 @@ export default function CategoriaBreakdown({ movimentacoes, categorias }: Props)
       return categoriaInfo ? `${categoriaInfo.color}66` : 'rgba(136, 136, 136, 0.2)';
     });
 
-    chartRef.current = new Chart(categoriaBreakdownChart.current, {
+    chartRef.current = new Chart(categoriaGanhosChart.current, {
       type: 'pie',
       data: {
         labels,
@@ -58,10 +58,10 @@ export default function CategoriaBreakdown({ movimentacoes, categorias }: Props)
   }, [movimentacoes, categorias]);
   return (
     
-    <div className="bg-white p-6 rounded-lg shadow">
-      <h3 className="text-lg font-semibold mb-4">Gastos por Categoria</h3>
-      <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
-        <canvas ref={categoriaBreakdownChart}></canvas>
+    <div className="bg-white rounded-lg p-6 shadow">
+      <h3 className="text-lg font-semibold mb-4">Ganhos do mês por Categoria</h3>
+      <div className="h-64 bg-gray-100 rounded flex items-center justify-center p-2">
+        <canvas ref={categoriaGanhosChart}></canvas>
       </div>
     </div>
   );

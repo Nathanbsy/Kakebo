@@ -77,15 +77,15 @@ router.get("/gasto-mensal", authMiddleware, async (req: Request, res: Response) 
     let mes = now.getMonth() + 1;
     let ano = now.getFullYear();
     
-    const firstDayOfMonth = new Date(ano, mes - 1, 1);
-    const lastDayOfMonth = new Date(ano, mes, 0);
+    const firstDayOfMonth = `${ano}-${String(mes).padStart(2, '0')}-01`;
+    const lastDayOfMonth = `${ano}-${String(mes).padStart(2, '0')}-${new Date(ano, mes, 0).getDate()}`;
 
     const gastoMensal = await prisma.movimentacao.findMany({
       where: {
         userId,
         data: {
-          gte: firstDayOfMonth,
-          lte: lastDayOfMonth,
+          gte: new Date(firstDayOfMonth),
+          lte: new Date(lastDayOfMonth + 'T23:59:59.999Z'),
         },
         tipo: "Despesa",
       },
@@ -105,26 +105,41 @@ router.get("/gasto-mensal", authMiddleware, async (req: Request, res: Response) 
 
 router.get("/receita-mensal", authMiddleware, async (req: Request, res: Response) => {
   try {
+    console.log("Endpoint /movimentacoes/receita-mensal acessado");
     const userId = req.user?.id;
+    console.log("userId:", userId);
+    
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "UserId não encontrado no token" });
+    }
+    
     const now = new Date();
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    let mes = now.getMonth() + 1;
+    let ano = now.getFullYear();
+    
+    const firstDayOfMonth = `${ano}-${String(mes).padStart(2, '0')}-01`;
+    const lastDayOfMonth = `${ano}-${String(mes).padStart(2, '0')}-${new Date(ano, mes, 0).getDate()}`;
 
-    const receitaMensal = await prisma.movimentacao.aggregate({
+    console.log(firstDayOfMonth, lastDayOfMonth);
+
+    const receitaMensal = await prisma.movimentacao.findMany({
       where: {
         userId,
         data: {
-          gte: firstDayOfMonth,
-          lte: lastDayOfMonth,
+          gte: new Date(firstDayOfMonth),
+          lte: new Date(lastDayOfMonth + 'T23:59:59.999Z'),
         },
         tipo: "Receita",
       },
-      _sum: {
-        quantia: true,
+      include: {
+        categoria: true,
       },
+      orderBy: { data: "desc" },
     });
-
-    return res.json({ success: true, data: receitaMensal });
+    
+    console.log(`Receita mensal encontrada: ${receitaMensal.length} itens`);
+    
+    return res.json({ success: true, data: receitaMensal, periodo: { mes, ano } });
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }
@@ -170,7 +185,7 @@ router.post("/", authMiddleware, async (req: Request, res: Response) => {
       data: {
         ...data,
         userId: userId!,
-        data: new Date(data.data),
+        data: data.data,
         quantia: data.quantia, 
       },
       include: { categoria: true },
@@ -201,11 +216,19 @@ router.put("/:id", authMiddleware, async (req: Request, res: Response) => {
       return res.status(404).json({ success: false, error: "Movimentação não encontrada" });
     }
 
+    // let localDate = undefined;
+    // if (data.data) {
+    //   const dateParts = data.data instanceof Date 
+    //     ? data.data.toISOString().split('T')[0].split('-')
+    //     : data.data?.toString().split('-');
+    //   localDate = new Date(Number(dateParts[0]), Number(dateParts[1]) - 1, Number(dateParts[2]));
+    // }
+
     const updated = await prisma.movimentacao.update({
       where: { id },
       data: {
         ...data,
-        data: data.data ? new Date(data.data) : undefined,
+        data: data.data,
         quantia: data.quantia ? data.quantia : undefined,
       },
       include: { categoria: true },

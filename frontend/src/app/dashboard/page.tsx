@@ -1,20 +1,23 @@
 "use client";
 
-import MensalSpending from "@/src/components/Charts/MensalSpending";
-import CategoriaBreakdown from "@/src/components/Charts/CategoriaBreakdown";
 import { useEffect, useState } from "react";
 import { Categoria, Movimentacao, User } from "@/types";
 import api from "@/src/services/api";
 import styles from "@/src/components/css/Dashboard.module.css";
+import GastosMes from "@/src/components/Charts/GastosMes";
+import GastosPorCategoria from "@/src/components/Charts/GastosPorCategoria";
+import GanhosPorCategoria from "@/src/components/Charts/GanhosPorCategoria";
+import GanhosMes from "@/src/components/Charts/GanhosMes";
 
 export default function DashboardPage() {
-  const [ movimentacoes, setMovimentacoes ] = useState<Movimentacao[]>([]);
+  const [ movimentacoesGastos, setMovimentacoesGastos ] = useState<Movimentacao[]>([]);
+  const [ movimentacoesGanhos, setMovimentacoesGanhos ] = useState<Movimentacao[]>([]);
   const [ categorias, setCategorias ] = useState<Categoria[]>([]);
   const [ user, setUser ] = useState<User | null>(null);
 
-  var totalGastoMes: number = Number(movimentacoes.reduce((sum: number, mov: Movimentacao) => sum + Number(mov.quantia), 0));
-
-  var totalTransacoes: number = Number(movimentacoes.length);
+  var totalGastoMes: number = Number(movimentacoesGastos.reduce((sum: number, mov: Movimentacao) => sum + Number(mov.quantia), 0));
+  var totalGanhosMes: number = Number(movimentacoesGanhos.reduce((sum: number, mov: Movimentacao) => sum + Number(mov.quantia), 0));
+  var totalTransacoes: number = Number(movimentacoesGastos.length);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,10 +35,19 @@ export default function DashboardPage() {
         .then((resposta) => {
           console.log("Resposta da API /movimentacoes/gasto-mensal:", resposta);
           if (!resposta || !resposta.data) {
-            setMovimentacoes([]);
+            setMovimentacoesGastos([]);
             return;
           }
-          setMovimentacoes(resposta.data.data);
+          setMovimentacoesGastos(resposta.data.data);
+        });
+        await api.get("/movimentacoes/receita-mensal")
+        .then((resposta) => {
+          console.log("Resposta da API /movimentacoes/receita-mensal:", resposta);
+          if (!resposta || !resposta.data) {
+            setMovimentacoesGanhos([]);
+            return;
+          }
+          setMovimentacoesGanhos(resposta.data.data);
         });
         await api.get("/categorias")
         .then((resposta) => {
@@ -80,6 +92,10 @@ export default function DashboardPage() {
           <p className="text-3xl font-bold text-gray-900">R$ {Number(user?.rendaMensal)?.toFixed(2).replace('.', ',') ?? "0,00"}</p>
         </div>
         <div className={styles["dashboard-card"]}>
+          <p className="text-gray-600 text-sm">Total Recebido Este Mês</p>
+          <p className="text-3xl font-bold text-gray-900">R$ {Number(totalGanhosMes)?.toFixed(2).replace('.', ',') ?? "0,00"}</p>
+        </div>
+        <div className={styles["dashboard-card"]}>
           <p className="text-gray-600 text-sm">Total Gasto Este Mês</p>
           <p className="text-3xl font-bold text-gray-900">R$ {Number(totalGastoMes)?.toFixed(2).replace('.', ',') ?? "0,00"}</p>
         </div>
@@ -90,8 +106,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <MensalSpending movimentacoes={movimentacoes} />
-        <CategoriaBreakdown movimentacoes={movimentacoes} categorias={categorias} />
+        <GastosMes movimentacoes={movimentacoesGastos} />
+        <GastosPorCategoria movimentacoes={movimentacoesGastos} categorias={categorias} />
+        <GanhosMes movimentacoes={movimentacoesGanhos} />
+        <GanhosPorCategoria movimentacoes={movimentacoesGanhos} categorias={categorias} />
       </div>
     </div>
   );
