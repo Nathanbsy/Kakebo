@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
 import { authMiddleware } from "../../shared/utils/middleware";
+import { stringify } from "csv-stringify/sync";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -146,6 +147,92 @@ router.get("/anual", authMiddleware, async (req: Request, res: Response) => {
         porMes,
       },
     });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+// GET /api/relatorios/exportar
+router.get("/exportar", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    
+    // Validar se userId existe
+    if (!userId) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
+
+    const { dataInicio, dataFim, sepadadoPor } = req.query;
+
+    // Validar datas
+    if (!dataInicio || !dataFim) {
+      return res.status(400).json({ success: false, error: "Data inicial e final são obrigatórias" });
+    }
+
+    const startDate = new Date(String(dataInicio));
+    const endDate = new Date(String(dataFim));
+
+    // Validar se as datas são válidas
+    if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+      return res.status(400).json({ success: false, error: "Datas inválidas" });
+    }
+
+    // Buscar movimentações
+    const movimentacoes = await prisma.movimentacao.findMany({
+      where: {
+        userId,
+        data: {
+          gte: startDate,
+          lte: new Date(endDate.getTime() + 86400000), // Adiciona 1 dia para incluir o dia final
+        },
+      },
+      include: { categoria: true },
+      orderBy: { data: "asc" },
+    });
+
+    // Preparar dados para CSV
+    const records = movimentacoes.map((m) => ({
+      Data: m.data.toLocaleDateString("pt-BR"),
+      Categoria: m.categoria.nome,
+      Descrição: m.descricao,
+      Tipo: m.tipo === "receita" ? "Receita" : "Despesa",
+      Valor: m.quantia.toString().replace(".", ","),
+    }));
+
+    // Gerar CSV
+    const csv = stringify(records, {
+      header: true,
+      columns: ["Data", "Categoria", "Descrição", "Tipo", "Valor"],
+    });
+
+    // Calcular resumo
+    const totalReceita = movimentacoes
+      .filter((m) => m.tipo === "receita")
+      .reduce((sum, m) => sum + Number(m.quantia), 0);
+
+    const totalDespesa = movimentacoes
+      .filter((m) => m.tipo === "despesa")
+      .reduce((sum, m) => sum + Number(m.quantia), 0);
+
+    const saldo = totalReceita - totalDespesa;
+
+    // Adicionar resumo no final
+    const resumoLines = [
+      "",
+      "RESUMO",
+      `Total Receita,${totalReceita.toString().replace(".", ",")}`,
+      `Total Despesa,${totalDespesa.toString().replace(".", ",")}`,
+      `Saldo,${saldo.toString().replace(".", ",")}`,
+    ];
+
+    const csvFinal = csv + resumoLines.join("\n");
+
+    // Configurar headers para download
+    const fileName = `relatorio_${String(dataInicio).replace(/\//g, "-")}_${String(dataFim).replace(/\//g, "-")}.csv`;
+    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+    return res.send(csvFinal);
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
   }

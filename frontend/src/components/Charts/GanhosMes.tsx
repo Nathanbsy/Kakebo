@@ -39,9 +39,6 @@ export default function GanhosMes({ movimentacoes }: { movimentacoes: Movimentac
             <div className="h-64 bg-gray-100 rounded flex items-center justify-center">
                 <canvas id="ganhosMesChart" ref={ganhosMesChart}></canvas>
             </div>
-            <button onClick={() => console.log("Dados de ganhos do mês:", movimentacoes)} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-                console log
-            </button>
         </div>
   );
 }
