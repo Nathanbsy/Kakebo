@@ -1,7 +1,7 @@
 "use client";
 
 import { BarChart, FileSpreadsheet, Settings, Tag, WalletMinimal } from 'lucide-react';
-import './globals.css'
+import '../globals.css'
 import Card from "@/src/components/Card";
 
 export default function HomePage() {

@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { z } from "zod";
 import { PrismaClient } from "@prisma/client";
 import { authMiddleware } from "../../shared/utils/middleware";
+import { parseOFX, ehArquivoOFXValido } from "../../shared/utils/ofx-parser";
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -142,6 +143,116 @@ router.get("/receita-mensal", authMiddleware, async (req: Request, res: Response
     return res.json({ success: true, data: receitaMensal, periodo: { mes, ano } });
   } catch (error) {
     return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+
+// POST /api/movimentacoes/importar-ofx
+router.post("/importar-ofx", authMiddleware, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    const { conteudoArquivo } = req.body;
+
+    // Validar dados de entrada
+    if (!conteudoArquivo || typeof conteudoArquivo !== "string") {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Arquivo OFX não fornecido ou inválido" 
+      });
+    }
+
+    // Validar se é um arquivo OFX válido
+    if (!ehArquivoOFXValido(conteudoArquivo)) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Arquivo não é um OFX válido. Certifique-se de que é um arquivo OFX do seu banco." 
+      });
+    }
+
+    // Buscar a categoria padrão "Importado de OFX"
+    const categoriaOFX = await prisma.categoria.findFirst({
+      where: { 
+        userId,
+        nome: "Importado de OFX" 
+      },
+    });
+
+    if (!categoriaOFX) {
+      return res.status(500).json({ 
+        success: false, 
+        error: "Categoria padrão não encontrada. Por favor, contato o suporte." 
+      });
+    }
+
+    // Parse do arquivo OFX
+    const transacoes = parseOFX(conteudoArquivo);
+
+    if (transacoes.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Nenhuma transação encontrada no arquivo OFX" 
+      });
+    }
+
+    // Criar movimentações no banco
+    const movimentacoesJaExistem = await prisma.movimentacao.findMany({
+      where: {
+        userId,
+        descricao: {
+          in: transacoes.map(t => t.id), // Usando ID da transação OFX na descrição para deduplicação
+        },
+      },
+    });
+
+    const idsJaExistentes = new Set(
+      movimentacoesJaExistem.map(m => m.descricao?.split(" | ")[0])
+    );
+
+    // Filtrar transações já importadas
+    const transacoesNovas = transacoes.filter(
+      t => !idsJaExistentes.has(t.id)
+    );
+
+    if (transacoesNovas.length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: "Todas as transações deste arquivo já foram importadas" 
+      });
+    }
+
+    // Criar movimentações
+    const movimentacoesCriadas = await Promise.all(
+      transacoesNovas.map(t =>
+        prisma.movimentacao.create({
+          data: {
+            userId: userId!,
+            categoriaId: categoriaOFX.id,
+            quantia: t.quantia,
+            descricao: `${t.id} | ${t.descricao}`, // Armazena ID para deduplicação
+            data: t.data,
+            tipo: t.tipo,
+            metodo: "Transferência Bancária",
+          },
+          include: { categoria: true },
+        })
+      )
+    );
+
+    return res.status(201).json({ 
+      success: true, 
+      data: {
+        importadas: movimentacoesCriadas.length,
+        duplicadas: transacoes.length - transacoesNovas.length,
+        movimentacoes: movimentacoesCriadas,
+      },
+      message: `${movimentacoesCriadas.length} transações importadas com sucesso!`
+    });
+
+  } catch (error: any) {
+    console.error("Erro ao importar OFX:", error);
+    return res.status(500).json({ 
+      success: false, 
+      error: "Erro ao processar arquivo OFX" 
+    });
   }
 });
 

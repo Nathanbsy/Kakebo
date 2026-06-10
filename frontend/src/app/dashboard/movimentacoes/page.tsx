@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import MovimentacaoForm from "@/src/components/MovimentacaoForm";
 import MovimentacaoList from "@/src/components/MovimentacaoList";
+import OFXImporter from "@/src/components/OFXImporter";
 import api from "@/src/services/api";
 import { Categoria, Movimentacao } from "@/types";
 import styles from "@/src/components/css/Movimentacoes.module.css";
 
 export default function MovimentacoesPage() {
   const [mostraForm, setMostraForm] = useState(false);
+  const [mostraImportador, setMostraImportador] = useState(false);
   const [movimentacoes, setMovimentacoes] = useState<Movimentacao[]>([]);
   const [mensagemRetorno, setMensagemRetorno] = useState<string>("");
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -101,6 +103,17 @@ export default function MovimentacoesPage() {
           />
         </div>
       )}
+
+      {mostraImportador && (
+        <OFXImporter
+          onSucesso={() => {
+            setMostraImportador(false);
+            fetchMovimentacoes();
+          }}
+          onCancelar={() => setMostraImportador(false)}
+        />
+      )}
+
       <div>
         <div className="bg-white rounded-lg shadow">
           <MovimentacaoList 
@@ -119,7 +132,7 @@ export default function MovimentacoesPage() {
               <p>Total ganho: R$ {totalGanho.toFixed(2).replace('.', ',')}</p>
           </div>
           <button
-            onClick={() => (console.log(movimentacoes))}
+            onClick={() => setMostraImportador(!mostraImportador)}
             className={styles.btn}
           >
             Importar OFX

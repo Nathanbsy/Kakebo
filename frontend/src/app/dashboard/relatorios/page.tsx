@@ -37,7 +37,6 @@ export default function RelatoriosPage() {
         responseType: "blob",
       });
 
-      // Criar blob e fazer download
       const url = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = url;

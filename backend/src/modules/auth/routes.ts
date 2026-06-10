@@ -40,6 +40,17 @@ router.post("/register", async (req: Request, res: Response) => {
       data: { email, senha: hashedPassword, nome },
     });
 
+    // Cria categorias padrão para o novo usuário
+    const defaultCategories = [
+      { userId: user.id, nome: "Importado de OFX", color: "#9CA3AF" },
+    ];
+    
+    await Promise.all(
+      defaultCategories.map(cat => 
+        prisma.categoria.create({ data: cat })
+      )
+    );
+
     // gera o token de autenticação
     const token = jwt.sign({ id: user.id, email: user.email }, config.jwt.secret, { expiresIn: "24h" });
     const refreshToken = jwt.sign({ id: user.id, email: user.email }, config.jwt.refreshSecret, { expiresIn: "7d" });

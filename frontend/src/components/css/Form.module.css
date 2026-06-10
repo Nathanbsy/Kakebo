@@ -106,14 +106,7 @@
 .formulario {
   padding: 16px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.211);
-  transition: all 0.2s ease;
-}
-
-.formulario:hover {
-  transform: scale(1.005);
-  transform:translateY(-5px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.413);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.112);
 }
 
 .escondido {

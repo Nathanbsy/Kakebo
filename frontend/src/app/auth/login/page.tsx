@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "../../../components/css/Form.module.css";
 import { useAuth } from "../../../../hooks/useAuth";
@@ -22,7 +21,7 @@ export default function LoginPage() {
   }
 
   if (isUserLoggedIn()) {
-    window.location.href = "/";
+    window.location.href = "/home";
   }
   
   const handleSubmit = async (evento: React.FormEvent) => {
@@ -31,7 +30,7 @@ export default function LoginPage() {
     setError(null);
     try {
       await login(user.email, user.password);
-      window.location.href = "/";
+      window.location.href = "/home";
     } catch (err) {
       setError("Falha ao realizar o login");
     } finally {
@@ -48,7 +47,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -89,7 +88,6 @@ export default function LoginPage() {
             <button
             type="submit"
             disabled={loading}
-            className={styles["login-button"]}
           >
             {loading ? "Entrando..." : "Entrar"}
           </button>

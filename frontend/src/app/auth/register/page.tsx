@@ -24,7 +24,7 @@ export default function RegisterPage() {
   }
 
   if (isUserLoggedIn()) {
-    router.push("/");
+    router.push("/home");
   }
 
   const escrever = (evento: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,15 +70,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="flex justify-center flex-col gap-8 items-center max-w-md w-full h-full space-y-8">
+    <div className="flex items-center justify-center min-h-screen overflow-hidden">
+      <div className="flex justify-center flex-col gap-4 items-center space-y-8">
         <div>
-          <h2 className="py-16 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Registrar no Kakeibo
           </h2>
         </div>
         <form onSubmit={handleSubmit}>
-          <div className={styles["formulario"] + ' flex justify-center items-center flex-col w-82 h-fit'}>
+          <div className={styles["formAuth"] + ' flex justify-center items-center flex-col w-82 h-fit mb-4'}>
             <div className={styles["input-container"]}>
               <input
               type="text"
@@ -145,18 +145,18 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-8.5 flex justify-center items-center border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
                 {loading ? "Registrando..." : "Registrar"}
             </button>
-            <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Já tem conta?{" "}
-              <Link href="/auth/login" className="text-blue-600 hover:text-blue-500">
-                Entrar
-              </Link>
-            </p>
+            
           </div>
+          <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Já tem conta?{" "}
+                <Link href="/auth/login" className="text-blue-600 hover:text-blue-500">
+                  Entrar
+                </Link>
+              </p>
           </div>
         </form>
       </div>

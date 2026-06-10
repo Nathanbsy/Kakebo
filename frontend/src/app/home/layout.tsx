@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Nunito } from "next/font/google";
-import "./globals.css";
-import Back from "../components/Back";
-import Logout from "../components/Logout";
+import Logout from "../../components/Logout";
+import "../globals.css";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
   description: "Gerenciamento financeiro pessoal inspirado no método japonês Kakebo",
 };
 
-export default function RootLayout({
+export default function HomeLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -26,12 +25,11 @@ export default function RootLayout({
       className={`${nunito.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <Back />
         <div className="flex h-screen">
           {/* <Sidebar /> */}
           <div className="flex-1 flex flex-col">
             {/* <Header /> */}
-            <main className="flex-1 overflow-auto p-6">{children}</main>
+            <main className="flex-1 overflow-auto p-16">{children}</main>
           </div>
         </div>
         <Logout />
